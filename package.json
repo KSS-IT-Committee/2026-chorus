@@ -3,10 +3,16 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "changelog": "node scripts/build-changelog.mjs",
+    "predev": "npm run changelog",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "lint:fix": "eslint --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "fix": "npm run lint:fix && npm run format"
   },
   "dependencies": {
     "drizzle-orm": "^0.45.4",
