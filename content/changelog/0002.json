@@ -1,0 +1,5 @@
+{
+  "title": "Github Actionsによる自動テストの追加",
+  "description": "Github Actionsという、自動でテストを定期的に回してくれるものの準備を行いました。",
+  "credits": ["@SakaYq4875"]
+}
