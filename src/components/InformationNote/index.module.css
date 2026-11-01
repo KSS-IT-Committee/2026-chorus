@@ -1,0 +1,47 @@
+.note {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px 18px;
+  border: 1px solid var(--theme-border);
+  border-radius: 9px;
+  background: var(--theme-surface-soft);
+  color: var(--theme-muted);
+}
+
+.icon {
+  display: grid;
+  width: 21px;
+  height: 21px;
+  flex: 0 0 auto;
+  place-items: center;
+  margin-top: 1px;
+  border: 1px solid var(--theme-accent);
+  border-radius: 50%;
+  color: var(--theme-strong);
+  font-size: 14px;
+  font-style: italic;
+  font-weight: 700;
+}
+
+.note p {
+  font-size: 16px;
+  line-height: 1.7;
+}
+
+.warning {
+  gap: 11px;
+  padding: 15px 16px;
+  border-radius: 8px;
+  color: var(--theme-warning);
+}
+
+.warning .icon {
+  border-color: var(--theme-warning);
+  font-size: 15px;
+  font-style: normal;
+}
+
+.warning p {
+  line-height: 1.75;
+}

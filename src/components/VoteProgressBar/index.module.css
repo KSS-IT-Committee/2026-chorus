@@ -1,0 +1,82 @@
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.text {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--theme-muted);
+  font-size: 16px;
+}
+
+.text strong {
+  color: var(--theme-strong);
+  font-size: 18px;
+}
+
+.text strong span {
+  color: var(--theme-muted);
+  font-size: 16px;
+  font-weight: 400;
+}
+
+.track {
+  position: relative;
+  height: 18px;
+}
+
+.markers {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dot {
+  z-index: 1;
+  width: clamp(6px, 1.8vw, 12px);
+  height: clamp(6px, 1.8vw, 12px);
+  border: 2px solid var(--theme-border);
+  border-radius: 50%;
+  background: var(--theme-input-surface);
+  transition:
+    border-color 180ms ease,
+    background 180ms ease,
+    transform 180ms ease;
+}
+
+.completedDot {
+  border-color: var(--theme-progress);
+  background: var(--theme-progress);
+  transform: scale(1.08);
+}
+
+.currentDot {
+  border-color: var(--theme-progress);
+  background: var(--theme-progress);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--theme-progress) 24%, transparent);
+  transform: scale(1.25);
+}
+
+.bar {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  display: block;
+  height: 6px;
+  border-radius: 99px;
+  background: var(--theme-progress);
+  transform: translateY(-50%);
+  transition: width 180ms ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dot,
+  .bar {
+    transition: none;
+  }
+}

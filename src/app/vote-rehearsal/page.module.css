@@ -1,0 +1,317 @@
+.page {
+  min-height: 100vh;
+  padding: 48px 24px;
+  color: var(--theme-text);
+  background:
+    radial-gradient(circle at 12% 18%, color-mix(in srgb, var(--YELLOW_A) 30%, transparent) 0 1px, transparent 1.6px),
+    radial-gradient(circle at 82% 13%, color-mix(in srgb, var(--YELLOW_A) 35%, transparent) 0 1px, transparent 1.6px),
+    radial-gradient(circle at 91% 39%, color-mix(in srgb, var(--YELLOW_A) 25%, transparent) 0 1px, transparent 1.6px),
+    radial-gradient(circle at 6% 72%, color-mix(in srgb, var(--YELLOW_A) 22%, transparent) 0 1px, transparent 1.6px),
+    radial-gradient(ellipse at 8% 12%, var(--YELLOW_C) 0, transparent 31%),
+    radial-gradient(ellipse at 91% 87%, var(--YELLOW_B) 0, transparent 28%),
+    var(--theme-page-background);
+  font-size: 18px;
+}
+
+.shell {
+  width: min(100%, 760px);
+  margin: 0 auto;
+}
+
+.card {
+  width: 100%;
+}
+
+.cardTop {
+  padding: 12px 0 30px;
+}
+
+.title {
+  color: var(--theme-text);
+  font-size: clamp(38px, 6vw, 48px);
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  line-height: 1.45;
+}
+
+.cardBody {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+  padding: 0;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.fieldset {
+  min-width: 0;
+  padding: 0;
+  border: 0;
+}
+
+.fieldGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px 20px;
+}
+
+.field {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.labelText {
+  color: var(--theme-text);
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.numberInputWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.numberInputWrap input {
+  width: 100%;
+  min-width: 0;
+  height: 56px;
+  padding: 0 16px;
+  border: 1px solid var(--theme-border);
+  border-radius: 8px;
+  outline: none;
+  background: var(--theme-input-surface);
+  color: var(--theme-input-text);
+  font: inherit;
+  font-size: 18px;
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.numberInputWrap input:focus {
+  border-color: var(--theme-accent);
+  box-shadow: 0 0 0 3px rgba(86, 101, 165, 0.16);
+}
+
+.numberInputWrap input {
+  padding-right: 42px;
+  appearance: textfield;
+}
+
+.numberInputWrap input::-webkit-inner-spin-button,
+.numberInputWrap input::-webkit-outer-spin-button {
+  margin: 0;
+  appearance: none;
+}
+
+.inputSuffix {
+  position: absolute;
+  right: 14px;
+  color: var(--theme-muted);
+  font-size: 17px;
+  pointer-events: none;
+}
+
+.fieldHint {
+  margin-top: -3px;
+  color: var(--theme-muted);
+  font-size: 16px;
+}
+
+.primaryButton,
+.BackToTopButton {
+  display: flex;
+  width: 100%;
+  min-height: 60px;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  border: 0;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  transition:
+    background 150ms ease,
+    transform 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.primaryButton {
+  background: var(--theme-accent);
+  color: var(--theme-button-text);
+  cursor: pointer;
+}
+
+.primaryButton span {
+  font-size: 20px;
+  font-weight: 400;
+  line-height: 1;
+}
+
+.primaryButton:hover:not(:disabled) {
+  background: var(--theme-accent-hover);
+  box-shadow: 0 7px 18px rgba(47, 52, 103, 0.2);
+  transform: translateY(-1px);
+}
+
+.primaryButton:focus-visible,
+.BackToTopButton:focus-visible {
+  outline: 3px solid var(--theme-focus);
+  outline-offset: 3px;
+}
+
+.primaryButton:disabled {
+  background: var(--theme-disabled);
+  cursor: not-allowed;
+}
+
+.summary {
+  display: flex;
+  min-height: 68px;
+  align-items: center;
+  gap: 14px;
+  padding: 15px 18px;
+  border: 1px solid var(--theme-border);
+  border-radius: 9px;
+  background: var(--theme-surface-soft);
+}
+
+.summaryLabel {
+  color: var(--theme-muted);
+  font-size: 16px;
+}
+
+.summary strong {
+  color: var(--theme-strong);
+  font-size: 17px;
+}
+
+.summaryCount {
+  margin-left: auto;
+  color: var(--theme-muted);
+  font-size: 16px;
+  white-space: nowrap;
+}
+
+.voteForm {
+  display: flex;
+  flex-direction: column;
+  gap: 19px;
+  padding-top: 5px;
+}
+
+.finished {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 28px;
+  padding-top: 12px;
+  text-align: center;
+}
+
+.finishedMessage {
+  color: var(--theme-muted);
+  font-size: 18px;
+  line-height: 2;
+}
+
+.finishedMessage strong {
+  color: var(--theme-strong);
+  font-size: 23px;
+}
+
+.BackToTopButton {
+  min-height: 56px;
+  border: 1px solid var(--theme-border);
+  background: var(--theme-surface);
+  color: var(--theme-accent);
+  cursor: pointer;
+}
+
+.BackToTopButton:hover {
+  background: var(--theme-surface-soft);
+  box-shadow: 0 5px 15px rgba(47, 49, 82, 0.08);
+}
+
+@media (max-width: 600px) {
+  .page {
+    padding: 28px 20px 32px;
+  }
+
+  .cardTop {
+    padding: 8px 0 26px;
+  }
+
+  .title {
+    font-size: 38px;
+  }
+
+  .fieldGrid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .summary {
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .summaryCount {
+    flex-basis: 100%;
+    margin-left: 0;
+  }
+
+}
+
+@media (max-width: 380px) {
+  .page {
+    padding-inline: 16px;
+  }
+
+  .title {
+    font-size: 36px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .numberInputWrap input,
+  .primaryButton,
+  .BackToTopButton {
+    transition: none;
+  }
+}
+
+@media (prefers-color-scheme: dark) {
+  .page {
+    background:
+      radial-gradient(circle at 12% 18%, color-mix(in srgb, var(--YELLOW_D) 90%, transparent) 0 1px, transparent 1.7px),
+      radial-gradient(circle at 82% 13%, color-mix(in srgb, var(--YELLOW_D) 80%, transparent) 0 1px, transparent 1.7px),
+      radial-gradient(circle at 91% 39%, color-mix(in srgb, var(--YELLOW_D) 72%, transparent) 0 1px, transparent 1.7px),
+      radial-gradient(circle at 6% 72%, color-mix(in srgb, var(--YELLOW_D) 68%, transparent) 0 1px, transparent 1.7px),
+      radial-gradient(circle at 67% 84%, color-mix(in srgb, var(--YELLOW_D) 72%, transparent) 0 1px, transparent 1.7px),
+      radial-gradient(ellipse at 8% 12%, color-mix(in srgb, var(--NAVY_D) 38%, transparent) 0, transparent 35%),
+      radial-gradient(ellipse at 91% 87%, color-mix(in srgb, var(--NAVY_C) 42%, transparent) 0, transparent 32%),
+      var(--theme-page-background);
+  }
+
+  .primaryButton {
+    color: var(--theme-button-text);
+  }
+
+  .primaryButton:hover:not(:disabled) {
+    color: var(--theme-button-text);
+  }
+
+  .BackToTopButton:hover {
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  }
+}
