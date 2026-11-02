@@ -1,3 +1,4 @@
+import { useEffect, useRef, type KeyboardEvent } from "react";
 import styles from "./index.module.css";
 
 type VoteConfirmationProps = {
@@ -17,6 +18,49 @@ export default function VoteConfirmation({
   onCancel,
   onConfirm,
 }: VoteConfirmationProps) {
+  const cancelButtonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    const previousActiveElement = document.activeElement;
+    cancelButtonRef.current?.focus();
+
+    return () => {
+      if (
+        previousActiveElement instanceof HTMLElement &&
+        previousActiveElement.isConnected
+      ) {
+        previousActiveElement.focus();
+      }
+    };
+  }, []);
+
+  function handleDialogKeyDown(event: KeyboardEvent<HTMLElement>) {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      onCancel();
+      return;
+    }
+
+    if (event.key !== "Tab") return;
+
+    const focusableElements =
+      event.currentTarget.querySelectorAll<HTMLElement>(
+        'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+      );
+    const firstElement = focusableElements[0];
+    const lastElement = focusableElements[focusableElements.length - 1];
+
+    if (!firstElement || !lastElement) {
+      event.preventDefault();
+    } else if (event.shiftKey && document.activeElement === firstElement) {
+      event.preventDefault();
+      lastElement.focus();
+    } else if (!event.shiftKey && document.activeElement === lastElement) {
+      event.preventDefault();
+      firstElement.focus();
+    }
+  }
+
   return (
     <div className={styles.overlay}>
       <section
@@ -25,6 +69,7 @@ export default function VoteConfirmation({
         aria-modal="true"
         aria-labelledby="confirm-title"
         aria-describedby="confirm-description"
+        onKeyDown={handleDialogKeyDown}
       >
         <p className={styles.eyebrow}>最終確認</p>
         <h2 id="confirm-title" className={styles.title}>
@@ -55,6 +100,7 @@ export default function VoteConfirmation({
           <button
             className={styles.cancel}
             type="button"
+            ref={cancelButtonRef}
             onClick={onCancel}
           >
             戻って修正する
@@ -62,7 +108,6 @@ export default function VoteConfirmation({
           <button
             className={styles.confirm}
             type="button"
-            autoFocus
             onClick={onConfirm}
           >
             投票を確定する

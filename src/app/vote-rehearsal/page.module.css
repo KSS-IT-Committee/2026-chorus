@@ -10,6 +10,7 @@
     radial-gradient(ellipse at 8% 12%, var(--YELLOW_C) 0, transparent 31%),
     radial-gradient(ellipse at 91% 87%, var(--YELLOW_B) 0, transparent 28%),
     var(--theme-page-background);
+  font-family: "MS ｺﾞｼｯｸ", sans-serif;
   font-size: 18px;
 }
 
@@ -28,7 +29,9 @@
 
 .title {
   color: var(--theme-text);
+  font-family:"HG創英角ｺﾞｼｯｸUB",sans-serif;
   font-size: clamp(38px, 6vw, 48px);
+  text-decoration: underline;
   font-weight: 500;
   letter-spacing: 0.05em;
   line-height: 1.45;
@@ -51,6 +54,16 @@
   min-width: 0;
   padding: 0;
   border: 0;
+}
+
+.visuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  clip-path: inset(50%);
 }
 
 .fieldGrid {
@@ -82,10 +95,11 @@
   width: 100%;
   min-width: 0;
   height: 56px;
-  padding: 0 16px;
+  padding: 0 42px 0 16px;
   border: 1px solid var(--theme-border);
   border-radius: 8px;
   outline: none;
+  appearance: textfield;
   background: var(--theme-input-surface);
   color: var(--theme-input-text);
   font: inherit;
@@ -98,11 +112,6 @@
 .numberInputWrap input:focus {
   border-color: var(--theme-accent);
   box-shadow: 0 0 0 3px rgba(86, 101, 165, 0.16);
-}
-
-.numberInputWrap input {
-  padding-right: 42px;
-  appearance: textfield;
 }
 
 .numberInputWrap input::-webkit-inner-spin-button,
@@ -269,7 +278,6 @@
     flex-basis: 100%;
     margin-left: 0;
   }
-
 }
 
 @media (max-width: 380px) {

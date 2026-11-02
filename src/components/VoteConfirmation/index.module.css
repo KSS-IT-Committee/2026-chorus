@@ -133,3 +133,10 @@
     grid-template-columns: 1fr;
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .cancel,
+  .confirm {
+    transition: none;
+  }
+}

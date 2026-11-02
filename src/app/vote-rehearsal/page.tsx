@@ -17,8 +17,8 @@ type Grade = (typeof grades)[number];
 type ClassName = (typeof classes)[number];
 type Vote = {
   attendanceNumber: number;
-  targetClass: string;
-  secondTargetClass: string;
+  targetClass: ClassName;
+  secondTargetClass: ClassName;
 };
 
 export default function VoteRehearsalPage() {
@@ -28,8 +28,8 @@ export default function VoteRehearsalPage() {
   const [memberCount, setMemberCount] = useState(""); // 人数
   const [step, setStep] = useState<"setup" | "voting" | "finished">("setup"); // 投票状態管理
   const [attendanceNumber, setAttendanceNumber] = useState(""); // 出席番号
-  const [targetClass, setTargetClass] = useState(""); // 投票先のクラス
-  const [secondTargetClass, setSecondTargetClass] = useState(""); // 2番目の投票先
+  const [targetClass, setTargetClass] = useState<ClassName | "">(""); // 1番目の投票先
+  const [secondTargetClass, setSecondTargetClass] = useState<ClassName | "">(""); // 2番目の投票先
   const [pendingVote, setPendingVote] = useState<Vote | null>(null); // 投票内容の一時保存
   const [votes, setVotes] = useState<Vote[]>([]); // 投票内容の保存
 
@@ -100,7 +100,7 @@ export default function VoteRehearsalPage() {
         <section className={styles.card} aria-labelledby="page-title">
           <div className={styles.cardTop}>
             <h1 id="page-title" className={styles.title}>
-              投票(リハーサル)
+              リハーサル用投票ページ
             </h1>
           </div>
 
@@ -130,9 +130,9 @@ export default function VoteRehearsalPage() {
             )}
 
             {step === "setup" && (
-              // 投票者情報入力画面
               <form className={styles.form} onSubmit={startVoting}>
                 <fieldset className={styles.fieldset}>
+                  <legend className={styles.visuallyHidden}>投票者情報</legend>
                   <div className={styles.fieldGrid}>
                     <PullDown
                       label="学年"
@@ -141,15 +141,13 @@ export default function VoteRehearsalPage() {
                         value: item,
                         label: `${item}年`,
                       }))}
-                      onChange={(value) => setGrade(value as Grade | "")}
+                      onChange={setGrade}
                     />
                     <PullDown
                       label="クラス"
                       value={className}
                       options={classOptions}
-                      onChange={(value) =>
-                        setClassName(value as ClassName | "")
-                      }
+                      onChange={setClassName}
                     />
                     <PullDown
                       label="パート"
@@ -158,9 +156,7 @@ export default function VoteRehearsalPage() {
                         value: item,
                         label: item,
                       }))}
-                      onChange={(value) =>
-                        setPart(value as (typeof parts)[number] | "")
-                      }
+                      onChange={setPart}
                     />
 
                     <label className={styles.field}>
@@ -204,7 +200,6 @@ export default function VoteRehearsalPage() {
             )}
 
             {step === "voting" && grade && className && (
-              // 終了画面
               <div className={styles.form}>
                 <div className={styles.summary}>
                   <span className={styles.summaryLabel}>投票者</span>
@@ -281,12 +276,11 @@ export default function VoteRehearsalPage() {
                 </form>
               </div>
             )}
-            
+
             {step === "finished" && (
-              // 終了画面
               <div className={styles.finished}>
                 <p className={styles.finishedMessage}>
-                    {grade}年{className}組・{part}の投票
+                  {grade}年{className}組・{part}の投票
                   <br />
                   <strong>{votes.length}</strong>人分の練習が完了しました。
                 </p>

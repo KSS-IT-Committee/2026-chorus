@@ -1,23 +1,23 @@
 import styles from "./index.module.css";
 
-type PullDownProps = {
+type PullDownProps<T extends string> = {
   label: string;
-  value: string;
+  value: T | "";
   options: readonly {
-    value: string;
+    value: T;
     label: string;
   }[];
   placeholder?: string;
-  onChange: (value: string) => void;
+  onChange: (value: T | "") => void;
 };
 
-export default function PullDown({
+export default function PullDown<T extends string>({
   label,
   value,
   options,
   placeholder = "選択してください",
   onChange,
-}: PullDownProps) {
+}: PullDownProps<T>) {
   return (
     <label className={styles.field}>
       <span className={styles.labelText}>{label}</span>
@@ -25,7 +25,18 @@ export default function PullDown({
         <select
           required
           value={value}
-          onChange={(event) => onChange(event.target.value)}
+          onChange={(event) => {
+            const selectedValue = event.currentTarget.value;
+            if (selectedValue === "") {
+              onChange("");
+              return;
+            }
+
+            const option = options.find(
+              (candidate) => candidate.value === selectedValue,
+            );
+            if (option) onChange(option.value);
+          }}
         >
           <option value="">
             {placeholder}
