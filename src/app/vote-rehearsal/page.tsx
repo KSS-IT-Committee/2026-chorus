@@ -18,6 +18,7 @@ type ClassName = (typeof classes)[number];
 type Vote = {
   attendanceNumber: number;
   targetClass: string;
+  secondTargetClass: string;
 };
 
 export default function VoteRehearsalPage() {
@@ -28,6 +29,7 @@ export default function VoteRehearsalPage() {
   const [step, setStep] = useState<"setup" | "voting" | "finished">("setup"); // 投票状態管理
   const [attendanceNumber, setAttendanceNumber] = useState(""); // 出席番号
   const [targetClass, setTargetClass] = useState(""); // 投票先のクラス
+  const [secondTargetClass, setSecondTargetClass] = useState(""); // 2番目の投票先
   const [pendingVote, setPendingVote] = useState<Vote | null>(null); // 投票内容の一時保存
   const [votes, setVotes] = useState<Vote[]>([]); // 投票内容の保存
 
@@ -49,6 +51,9 @@ export default function VoteRehearsalPage() {
       value: item,
       label: `${grade}年${item}組`,
     }));
+  const secondTargetClassOptions = targetClassOptions.filter(
+    (item) => item.value !== targetClass,
+  );
 
   function startVoting(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -58,11 +63,19 @@ export default function VoteRehearsalPage() {
 
   function submitVote(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!validAttendanceNumber || !targetClass) return;
+    if (
+      !validAttendanceNumber ||
+      !targetClass ||
+      !secondTargetClass ||
+      targetClass === secondTargetClass
+    ) {
+      return;
+    }
 
     setPendingVote({
       attendanceNumber: Number(attendanceNumber),
       targetClass,
+      secondTargetClass,
     });
   }
 
@@ -73,6 +86,7 @@ export default function VoteRehearsalPage() {
     setVotes(updatedVotes);
     setAttendanceNumber("");
     setTargetClass("");
+    setSecondTargetClass("");
     setPendingVote(null);
 
     if (updatedVotes.length >= count) {
@@ -86,11 +100,7 @@ export default function VoteRehearsalPage() {
         <section className={styles.card} aria-labelledby="page-title">
           <div className={styles.cardTop}>
             <h1 id="page-title" className={styles.title}>
-              {step === "finished" ? (
-                <>投票が完了しました</>
-              ) : (
-                <>投票（リハーサル）</>
-              )}
+              投票(リハーサル)
             </h1>
           </div>
 
@@ -229,11 +239,24 @@ export default function VoteRehearsalPage() {
                   </label>
 
                   <PullDown
-                    label="投票したいクラス"
+                    label="1番投票したいクラス"
                     value={targetClass}
                     options={targetClassOptions}
                     placeholder="クラスを選択してください"
-                    onChange={setTargetClass}
+                    onChange={(value) => {
+                      setTargetClass(value);
+                      if (value === secondTargetClass) {
+                        setSecondTargetClass("");
+                      }
+                    }}
+                  />
+
+                  <PullDown
+                    label="2番目に投票したいクラス"
+                    value={secondTargetClass}
+                    options={secondTargetClassOptions}
+                    placeholder="クラスを選択してください"
+                    onChange={setSecondTargetClass}
                   />
 
                   <InformationNote variant="warning">
@@ -245,7 +268,12 @@ export default function VoteRehearsalPage() {
                   <button
                     className={styles.primaryButton}
                     type="submit"
-                    disabled={!validAttendanceNumber || !targetClass}
+                    disabled={
+                      !validAttendanceNumber ||
+                      !targetClass ||
+                      !secondTargetClass ||
+                      targetClass === secondTargetClass
+                    }
                   >
                     この内容で投票する
                     <span aria-hidden="true">→</span>
@@ -275,6 +303,7 @@ export default function VoteRehearsalPage() {
           grade={grade}
           attendanceNumber={pendingVote.attendanceNumber}
           targetClass={pendingVote.targetClass}
+          secondTargetClass={pendingVote.secondTargetClass}
           onCancel={() => setPendingVote(null)}
           onConfirm={confirmVote}
         />

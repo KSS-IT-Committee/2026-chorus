@@ -4,6 +4,7 @@ type VoteConfirmationProps = {
   grade: string;
   attendanceNumber: number;
   targetClass: string;
+  secondTargetClass: string;
   onCancel: () => void;
   onConfirm: () => void;
 };
@@ -12,6 +13,7 @@ export default function VoteConfirmation({
   grade,
   attendanceNumber,
   targetClass,
+  secondTargetClass,
   onCancel,
   onConfirm,
 }: VoteConfirmationProps) {
@@ -37,9 +39,15 @@ export default function VoteConfirmation({
             <dd>{attendanceNumber}番</dd>
           </div>
           <div>
-            <dt>投票先:</dt>
+            <dt>1番に投票したいクラス:</dt>
             <dd>
               {grade}年{targetClass}組
+            </dd>
+          </div>
+          <div>
+            <dt>2番に投票したいクラス:</dt>
+            <dd>
+              {grade}年{secondTargetClass}組
             </dd>
           </div>
         </dl>
