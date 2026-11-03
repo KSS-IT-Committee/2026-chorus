@@ -10,7 +10,7 @@
     radial-gradient(ellipse at 8% 12%, var(--YELLOW_C) 0, transparent 31%),
     radial-gradient(ellipse at 91% 87%, var(--YELLOW_B) 0, transparent 28%),
     var(--theme-page-background);
-  font-family: "MS ｺﾞｼｯｸ", sans-serif;
+  font-family: "Noto Sans JP", sans-serif;
   font-size: 18px;
 }
 
