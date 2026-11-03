@@ -280,9 +280,9 @@ export default function VoteRehearsalPage() {
             {step === "finished" && (
               <div className={styles.finished}>
                 <p className={styles.finishedMessage}>
-                  {grade}年{className}組・{part}の投票
+                  {grade}年{className}組・{part}
                   <br />
-                  <strong>{votes.length}</strong>人分の練習が完了しました。
+                  <strong>{votes.length}</strong>人分の投票が完了しました。
                 </p>
                 <Link className={styles.BackToTopButton} href="/">
                   Topページに戻る
