@@ -10,8 +10,7 @@ export default function VoteProgressBar({
   total,
 }: VoteProgressBarProps) {
   const currentVoter = completed + 1;
-  const progress =
-    total > 1 ? (completed / (total - 1)) * 100 : 0;
+  const progress = total > 1 ? (completed / (total - 1)) * 100 : 0;
 
   return (
     <section className={styles.section} aria-label="投票の進み具合">
@@ -31,10 +30,7 @@ export default function VoteProgressBar({
         aria-valuenow={currentVoter}
         aria-valuetext={`${currentVoter}人目に投票中、全${total}人中${completed}人投票済み`}
       >
-        <span
-          className={styles.bar}
-          style={{ width: `${progress}%` }}
-        />
+        <span className={styles.bar} style={{ width: `${progress}%` }} />
         <span className={styles.markers} aria-hidden="true">
           {Array.from({ length: total }, (_, index) => (
             <span

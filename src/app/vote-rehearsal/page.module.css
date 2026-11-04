@@ -3,10 +3,26 @@
   padding: 48px 24px;
   color: var(--theme-text);
   background:
-    radial-gradient(circle at 12% 18%, color-mix(in srgb, var(--YELLOW_A) 30%, transparent) 0 1px, transparent 1.6px),
-    radial-gradient(circle at 82% 13%, color-mix(in srgb, var(--YELLOW_A) 35%, transparent) 0 1px, transparent 1.6px),
-    radial-gradient(circle at 91% 39%, color-mix(in srgb, var(--YELLOW_A) 25%, transparent) 0 1px, transparent 1.6px),
-    radial-gradient(circle at 6% 72%, color-mix(in srgb, var(--YELLOW_A) 22%, transparent) 0 1px, transparent 1.6px),
+    radial-gradient(
+      circle at 12% 18%,
+      color-mix(in srgb, var(--YELLOW_A) 30%, transparent) 0 1px,
+      transparent 1.6px
+    ),
+    radial-gradient(
+      circle at 82% 13%,
+      color-mix(in srgb, var(--YELLOW_A) 35%, transparent) 0 1px,
+      transparent 1.6px
+    ),
+    radial-gradient(
+      circle at 91% 39%,
+      color-mix(in srgb, var(--YELLOW_A) 25%, transparent) 0 1px,
+      transparent 1.6px
+    ),
+    radial-gradient(
+      circle at 6% 72%,
+      color-mix(in srgb, var(--YELLOW_A) 22%, transparent) 0 1px,
+      transparent 1.6px
+    ),
     radial-gradient(ellipse at 8% 12%, var(--YELLOW_C) 0, transparent 31%),
     radial-gradient(ellipse at 91% 87%, var(--YELLOW_B) 0, transparent 28%),
     var(--theme-page-background);
@@ -29,7 +45,7 @@
 
 .title {
   color: var(--theme-text);
-  font-family:"Yu Mincho", serif;
+  font-family: "Yu Mincho", serif;
   font-size: clamp(38px, 6vw, 48px);
   font-weight: 500;
   letter-spacing: 0.05em;
@@ -300,13 +316,41 @@
 @media (prefers-color-scheme: dark) {
   .page {
     background:
-      radial-gradient(circle at 12% 18%, color-mix(in srgb, var(--YELLOW_D) 90%, transparent) 0 1px, transparent 1.7px),
-      radial-gradient(circle at 82% 13%, color-mix(in srgb, var(--YELLOW_D) 80%, transparent) 0 1px, transparent 1.7px),
-      radial-gradient(circle at 91% 39%, color-mix(in srgb, var(--YELLOW_D) 72%, transparent) 0 1px, transparent 1.7px),
-      radial-gradient(circle at 6% 72%, color-mix(in srgb, var(--YELLOW_D) 68%, transparent) 0 1px, transparent 1.7px),
-      radial-gradient(circle at 67% 84%, color-mix(in srgb, var(--YELLOW_D) 72%, transparent) 0 1px, transparent 1.7px),
-      radial-gradient(ellipse at 8% 12%, color-mix(in srgb, var(--NAVY_D) 38%, transparent) 0, transparent 35%),
-      radial-gradient(ellipse at 91% 87%, color-mix(in srgb, var(--NAVY_C) 42%, transparent) 0, transparent 32%),
+      radial-gradient(
+        circle at 12% 18%,
+        color-mix(in srgb, var(--YELLOW_D) 90%, transparent) 0 1px,
+        transparent 1.7px
+      ),
+      radial-gradient(
+        circle at 82% 13%,
+        color-mix(in srgb, var(--YELLOW_D) 80%, transparent) 0 1px,
+        transparent 1.7px
+      ),
+      radial-gradient(
+        circle at 91% 39%,
+        color-mix(in srgb, var(--YELLOW_D) 72%, transparent) 0 1px,
+        transparent 1.7px
+      ),
+      radial-gradient(
+        circle at 6% 72%,
+        color-mix(in srgb, var(--YELLOW_D) 68%, transparent) 0 1px,
+        transparent 1.7px
+      ),
+      radial-gradient(
+        circle at 67% 84%,
+        color-mix(in srgb, var(--YELLOW_D) 72%, transparent) 0 1px,
+        transparent 1.7px
+      ),
+      radial-gradient(
+        ellipse at 8% 12%,
+        color-mix(in srgb, var(--NAVY_D) 38%, transparent) 0,
+        transparent 35%
+      ),
+      radial-gradient(
+        ellipse at 91% 87%,
+        color-mix(in srgb, var(--NAVY_C) 42%, transparent) 0,
+        transparent 32%
+      ),
       var(--theme-page-background);
   }
 

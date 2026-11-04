@@ -58,7 +58,8 @@
 .currentDot {
   border-color: var(--theme-progress);
   background: var(--theme-progress);
-  box-shadow: 0 0 0 4px color-mix(in srgb, var(--theme-progress) 24%, transparent);
+  box-shadow: 0 0 0 4px
+    color-mix(in srgb, var(--theme-progress) 24%, transparent);
   transform: scale(1.25);
 }
 

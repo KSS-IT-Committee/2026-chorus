@@ -11,9 +11,7 @@ export default function InformationNote({
   variant = "info",
 }: InformationNoteProps) {
   const className =
-    variant === "warning"
-      ? `${styles.note} ${styles.warning}`
-      : styles.note;
+    variant === "warning" ? `${styles.note} ${styles.warning}` : styles.note;
 
   return (
     <div className={className} role="note">

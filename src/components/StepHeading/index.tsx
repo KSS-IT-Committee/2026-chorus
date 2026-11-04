@@ -7,10 +7,10 @@ type StepHeadingProps = {
 };
 
 export default function StepHeading({
-    step,
-    title,
-    description,
-  }: StepHeadingProps) {
+  step,
+  title,
+  description,
+}: StepHeadingProps) {
   return (
     <div className={styles.heading}>
       <span className={styles.stepNumber}>{step}</span>

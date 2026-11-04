@@ -29,7 +29,9 @@ export default function VoteRehearsalPage() {
   const [step, setStep] = useState<"setup" | "voting" | "finished">("setup"); // 投票状態管理
   const [attendanceNumber, setAttendanceNumber] = useState(""); // 出席番号
   const [targetClass, setTargetClass] = useState<ClassName | "">(""); // 1番目の投票先
-  const [secondTargetClass, setSecondTargetClass] = useState<ClassName | "">(""); // 2番目の投票先
+  const [secondTargetClass, setSecondTargetClass] = useState<ClassName | "">(
+    "",
+  ); // 2番目の投票先
   const [pendingVote, setPendingVote] = useState<Vote | null>(null); // 投票内容の一時保存
   const [votes, setVotes] = useState<Vote[]>([]); // 投票内容の保存
 
@@ -206,9 +208,7 @@ export default function VoteRehearsalPage() {
                   <strong>
                     {grade}年{className}組・{part}
                   </strong>
-                  <span className={styles.summaryCount}>
-                    全{count}人
-                  </span>
+                  <span className={styles.summaryCount}>全{count}人</span>
                 </div>
 
                 <VoteProgressBar completed={votes.length} total={count} />

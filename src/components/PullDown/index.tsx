@@ -38,9 +38,7 @@ export default function PullDown<T extends string>({
             if (option) onChange(option.value);
           }}
         >
-          <option value="">
-            {placeholder}
-          </option>
+          <option value="">{placeholder}</option>
           {options.map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}

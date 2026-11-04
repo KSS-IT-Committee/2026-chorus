@@ -43,10 +43,9 @@ export default function VoteConfirmation({
 
     if (event.key !== "Tab") return;
 
-    const focusableElements =
-      event.currentTarget.querySelectorAll<HTMLElement>(
-        'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
-      );
+    const focusableElements = event.currentTarget.querySelectorAll<HTMLElement>(
+      'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+    );
     const firstElement = focusableElements[0];
     const lastElement = focusableElements[focusableElements.length - 1];
 
@@ -105,11 +104,7 @@ export default function VoteConfirmation({
           >
             戻って修正する
           </button>
-          <button
-            className={styles.confirm}
-            type="button"
-            onClick={onConfirm}
-          >
+          <button className={styles.confirm} type="button" onClick={onConfirm}>
             投票を確定する
           </button>
         </div>
