@@ -23,9 +23,7 @@ function getDb(): Db {
   }
 
   const client =
-    (process.env.NODE_ENV !== "production"
-      ? globalThis.pgClient
-      : undefined) ??
+    (process.env.NODE_ENV !== "production" ? globalThis.pgClient : undefined) ??
     postgres(databaseUrl, {
       max: process.env.NODE_ENV === "production" ? 1 : 10,
     });
@@ -44,12 +42,8 @@ export const db = new Proxy({} as Db, {
     const target = getDb();
     const value = Reflect.get(target, prop);
 
-    return typeof value === "function"
-      ? value.bind(target)
-      : value;
+    return typeof value === "function" ? value.bind(target) : value;
   },
 });
 
-export type Executor =
-  | Db
-  | Parameters<Parameters<Db["transaction"]>[0]>[0];
+export type Executor = Db | Parameters<Parameters<Db["transaction"]>[0]>[0];
