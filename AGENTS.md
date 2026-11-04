@@ -9,5 +9,6 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 <!-- END:nextjs-agent-rules -->
 
 ## そのほかのルール
+
 - package-lock.jsonは勝手に変更しないようにする
 - README.mdは勝手に変更しない
