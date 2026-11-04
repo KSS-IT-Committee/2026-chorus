@@ -1,0 +1,87 @@
+name: Auto Changelog
+
+on:
+  pull_request_target:
+    # synchronize で PR ブランチから changelog が消えた場合に再追加する。
+    # 既にエントリがあれば何もしないためループしない
+    types: [opened, synchronize]
+
+permissions:
+  contents: write
+
+# 同一 PR で opened と synchronize が同時に走って push が衝突しないよう直列化
+concurrency:
+  group: auto-changelog-${{ github.event.pull_request.number }}
+
+jobs:
+  create-file:
+    # fork からの PR は対象外: pull_request_target は secrets と書き込み権限を
+    # 持つため、fork のコード (package.json など) を扱ってはいけない
+    # Dependabot の実行では secrets が利用できないため、Dependabot PR は対象外。
+    # changelog が必要な場合は、メンテナーが別の PR で
+    # content/changelog/<PR番号>-changelog.json を追加する
+    if: >-
+      github.event.pull_request.head.repo.full_name == github.repository &&
+      github.event.pull_request.user.login != 'dependabot[bot]'
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v7.0.1
+        with:
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.pull_request.head.ref }}
+          persist-credentials: false
+
+      - name: Write log
+        env:
+          TITLE: ${{ github.event.pull_request.title }}
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          AUTHOR: ${{ github.event.pull_request.user.login }}
+        run: |
+          FILE="content/changelog/$(printf "%04d" "$PR_NUMBER")-changelog.json"
+
+          # 既にエントリがあれば上書きしない (手動で記入した説明を守る)
+          if [ -f "$FILE" ]; then
+            exit 0
+          fi
+
+          mkdir -p content/changelog
+
+          jq -n \
+            --arg title "$TITLE" \
+            --arg description "TODO" \
+            --arg author "@$AUTHOR" \
+            '{
+              title: $title,
+              description: $description,
+              credits: [$author]
+            }' > "$FILE"
+
+      - name: Commit
+        id: commit
+        env:
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add content/changelog
+
+          if git diff --cached --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          # Never run hooks from a checkout containing PR-controlled files.
+          git -c core.hooksPath=/dev/null commit -m "Add changelog for PR #$PR_NUMBER"
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+
+      - name: Push
+        if: steps.commit.outputs.changed == 'true'
+        env:
+          # GITHUB_TOKEN の push は workflow をトリガーしないため PAT で push する
+          GH_TOKEN: ${{ secrets.ROTARYMARS_PR_ACTION_TOKEN }}
+          BRANCH: ${{ github.event.pull_request.head.ref }}
+        run: |
+          git -c http.extraheader="AUTHORIZATION: basic $(printf 'x-access-token:%s' "$GH_TOKEN" | base64 -w0)" \
+            push origin "HEAD:$BRANCH"
