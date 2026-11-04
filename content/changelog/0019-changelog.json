@@ -1,7 +1,5 @@
 {
   "title": "リハーサル投票UI",
-  "description": "TODO",
-  "credits": [
-    "@SakaYq4875"
-  ]
+  "description": "リハーサルの投票ページのUIを基礎を作りました。バックエンドとの接続は(この時点で)行っていません。",
+  "credits": ["@SakaYq4875", "@kinoto0103"]
 }
