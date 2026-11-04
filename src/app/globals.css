@@ -15,7 +15,7 @@
   --theme-strong: var(--NAVY_C);
   --theme-accent: var(--NAVY_D);
   --theme-accent-hover: var(--NAVY_C);
-  --theme-border: var(--YELLOW_B);
+  --theme-border: #9b812b;
   --theme-surface: var(--YELLOW_D);
   --theme-surface-soft: var(--YELLOW_C);
   --theme-input-surface: var(--YELLOW_D);

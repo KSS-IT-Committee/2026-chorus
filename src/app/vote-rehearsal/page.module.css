@@ -129,6 +129,14 @@
   box-shadow: 0 0 0 3px rgba(86, 101, 165, 0.16);
 }
 
+@media (forced-colors: active) {
+  .numberInputWrap input:focus {
+    outline: 2px solid CanvasText;
+    outline-offset: 2px;
+    box-shadow: none;
+  }
+}
+
 .numberInputWrap input::-webkit-inner-spin-button,
 .numberInputWrap input::-webkit-outer-spin-button {
   margin: 0;
