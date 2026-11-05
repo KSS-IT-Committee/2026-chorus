@@ -24,7 +24,12 @@ export type RehearsalVoteResult =
   | { ok: true }
   | {
       ok: false;
-      reason: "invalid" | "not-on-roster" | "already-voted" | "error";
+      reason:
+        | "invalid"
+        | "not-on-roster"
+        | "already-voted"
+        | "unauthorized"
+        | "error";
       message: string;
     };
 

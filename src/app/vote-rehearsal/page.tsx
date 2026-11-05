@@ -7,7 +7,7 @@ import PullDown from "@/components/PullDown";
 import StepHeading from "@/components/StepHeading";
 import VoteConfirmation from "@/components/VoteConfirmation";
 import VoteProgressBar from "@/components/VoteProgressBar";
-import { submitRehearsalVote } from "./actions";
+import { checkVoteAccessCode, submitRehearsalVote } from "./actions";
 import styles from "./page.module.css";
 
 const grades = ["1", "2", "3"] as const;
@@ -27,6 +27,8 @@ export default function VoteRehearsalPage() {
   const [className, setClassName] = useState<ClassName | "">(""); // クラス
   const [part, setPart] = useState<(typeof parts)[number] | "">(""); // パート
   const [memberCount, setMemberCount] = useState(""); // 人数
+  const [accessCode, setAccessCode] = useState(""); // 投票コード
+  const [setupError, setSetupError] = useState(""); // 投票コードのエラー
   const [step, setStep] = useState<"setup" | "voting" | "finished">("setup"); // 投票状態管理
   const [attendanceNumber, setAttendanceNumber] = useState(""); // 出席番号
   const [targetClass, setTargetClass] = useState<ClassName | "">(""); // 1番目の投票先
@@ -49,7 +51,9 @@ export default function VoteRehearsalPage() {
   const isDuplicateAttendanceNumber =
     validAttendanceNumber &&
     votes.some((vote) => vote.attendanceNumber === Number(attendanceNumber));
-  const canStart = Boolean(grade && className && part && validCount);
+  const canStart = Boolean(
+    grade && className && part && validCount && accessCode.trim(),
+  );
   const classOptions = classes.map((item) => ({
     value: item,
     label: `${item}組`,
@@ -66,8 +70,17 @@ export default function VoteRehearsalPage() {
 
   function startVoting(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!canStart) return;
-    setStep("voting");
+    if (!canStart || isSubmitting) return;
+
+    startSubmitting(async () => {
+      const result = await checkVoteAccessCode(accessCode);
+      if (!result.ok) {
+        setSetupError(result.message);
+        return;
+      }
+      setSetupError("");
+      setStep("voting");
+    });
   }
 
   function submitVote(event: SubmitEvent<HTMLFormElement>) {
@@ -95,7 +108,7 @@ export default function VoteRehearsalPage() {
     const vote = pendingVote;
 
     startSubmitting(async () => {
-      const result = await submitRehearsalVote({
+      const result = await submitRehearsalVote(accessCode, {
         grade: Number(grade),
         classLetter: className,
         attendanceNumber: vote.attendanceNumber,
@@ -209,8 +222,34 @@ export default function VoteRehearsalPage() {
                         1〜40人
                       </span>
                     </label>
+
+                    <label className={styles.field}>
+                      <span className={styles.labelText}>投票コード</span>
+                      <span className={styles.numberInputWrap}>
+                        <input
+                          required
+                          type="password"
+                          autoComplete="off"
+                          value={accessCode}
+                          onChange={(event) => {
+                            setAccessCode(event.target.value);
+                            setSetupError("");
+                          }}
+                          aria-describedby="access-code-help"
+                        />
+                      </span>
+                      <span id="access-code-help" className={styles.fieldHint}>
+                        合唱委員から伝えられたコード
+                      </span>
+                    </label>
                   </div>
                 </fieldset>
+
+                {setupError && (
+                  <InformationNote variant="warning">
+                    {setupError}
+                  </InformationNote>
+                )}
 
                 <InformationNote>
                   投票内容は1人ずつ送信・保存されます。
@@ -219,7 +258,7 @@ export default function VoteRehearsalPage() {
                 <button
                   className={styles.primaryButton}
                   type="submit"
-                  disabled={!canStart}
+                  disabled={!canStart || isSubmitting}
                 >
                   投票をはじめる
                   <span aria-hidden="true">→</span>
