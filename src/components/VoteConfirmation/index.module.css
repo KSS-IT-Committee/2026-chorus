@@ -101,16 +101,22 @@
   color: var(--theme-button-text);
 }
 
-.cancel:hover,
-.confirm:hover {
+.cancel:disabled,
+.confirm:disabled {
+  cursor: progress;
+  opacity: 0.7;
+}
+
+.cancel:hover:not(:disabled),
+.confirm:hover:not(:disabled) {
   transform: translateY(-1px);
 }
 
-.cancel:hover {
+.cancel:hover:not(:disabled) {
   background: var(--theme-surface-soft);
 }
 
-.confirm:hover {
+.confirm:hover:not(:disabled) {
   background: var(--theme-accent-hover);
 }
 

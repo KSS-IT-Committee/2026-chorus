@@ -8,6 +8,7 @@ type VoteConfirmationProps = {
   secondTargetClass: string;
   onCancel: () => void;
   onConfirm: () => void;
+  isSubmitting?: boolean;
 };
 
 export default function VoteConfirmation({
@@ -17,6 +18,7 @@ export default function VoteConfirmation({
   secondTargetClass,
   onCancel,
   onConfirm,
+  isSubmitting = false,
 }: VoteConfirmationProps) {
   const cancelButtonRef = useRef<HTMLButtonElement>(null);
 
@@ -37,7 +39,7 @@ export default function VoteConfirmation({
   function handleDialogKeyDown(event: KeyboardEvent<HTMLElement>) {
     if (event.key === "Escape") {
       event.preventDefault();
-      onCancel();
+      if (!isSubmitting) onCancel();
       return;
     }
 
@@ -101,11 +103,18 @@ export default function VoteConfirmation({
             type="button"
             ref={cancelButtonRef}
             onClick={onCancel}
+            disabled={isSubmitting}
           >
             戻って修正する
           </button>
-          <button className={styles.confirm} type="button" onClick={onConfirm}>
-            投票を確定する
+          <button
+            className={styles.confirm}
+            type="button"
+            onClick={onConfirm}
+            disabled={isSubmitting}
+            aria-busy={isSubmitting}
+          >
+            {isSubmitting ? "送信中…" : "投票を確定する"}
           </button>
         </div>
       </section>

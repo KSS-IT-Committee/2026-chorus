@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, type SubmitEvent } from "react";
+import { useState, useTransition, type SubmitEvent } from "react";
 import Link from "next/link";
 import InformationNote from "@/components/InformationNote";
 import PullDown from "@/components/PullDown";
 import StepHeading from "@/components/StepHeading";
 import VoteConfirmation from "@/components/VoteConfirmation";
 import VoteProgressBar from "@/components/VoteProgressBar";
+import { submitRehearsalVote } from "./actions";
 import styles from "./page.module.css";
 
 const grades = ["1", "2", "3"] as const;
@@ -34,6 +35,8 @@ export default function VoteRehearsalPage() {
   ); // 2番目の投票先
   const [pendingVote, setPendingVote] = useState<Vote | null>(null); // 投票内容の一時保存
   const [votes, setVotes] = useState<Vote[]>([]); // 投票内容の保存
+  const [errorMessage, setErrorMessage] = useState(""); // 送信エラー
+  const [isSubmitting, startSubmitting] = useTransition(); // 送信中
 
   const count = Number(memberCount);
   const validCount = Number.isInteger(count) && count >= 1 && count <= 40;
@@ -42,6 +45,10 @@ export default function VoteRehearsalPage() {
     Number.isInteger(Number(attendanceNumber)) &&
     Number(attendanceNumber) >= 1 &&
     Number(attendanceNumber) <= 40;
+  // 同じ端末で同じ出席番号が二度投票しないようにする(サーバー側でも弾く)
+  const isDuplicateAttendanceNumber =
+    validAttendanceNumber &&
+    votes.some((vote) => vote.attendanceNumber === Number(attendanceNumber));
   const canStart = Boolean(grade && className && part && validCount);
   const classOptions = classes.map((item) => ({
     value: item,
@@ -67,6 +74,7 @@ export default function VoteRehearsalPage() {
     event.preventDefault();
     if (
       !validAttendanceNumber ||
+      isDuplicateAttendanceNumber ||
       !targetClass ||
       !secondTargetClass ||
       targetClass === secondTargetClass
@@ -74,6 +82,7 @@ export default function VoteRehearsalPage() {
       return;
     }
 
+    setErrorMessage("");
     setPendingVote({
       attendanceNumber: Number(attendanceNumber),
       targetClass,
@@ -82,18 +91,35 @@ export default function VoteRehearsalPage() {
   }
 
   function confirmVote() {
-    if (!pendingVote) return;
+    if (!pendingVote || !grade || !className || isSubmitting) return;
+    const vote = pendingVote;
 
-    const updatedVotes = [...votes, pendingVote];
-    setVotes(updatedVotes);
-    setAttendanceNumber("");
-    setTargetClass("");
-    setSecondTargetClass("");
-    setPendingVote(null);
+    startSubmitting(async () => {
+      const result = await submitRehearsalVote({
+        grade: Number(grade),
+        classLetter: className,
+        attendanceNumber: vote.attendanceNumber,
+        firstClass: vote.targetClass,
+        secondClass: vote.secondTargetClass,
+      });
 
-    if (updatedVotes.length >= count) {
-      setStep("finished");
-    }
+      setPendingVote(null);
+      if (!result.ok) {
+        setErrorMessage(result.message);
+        return;
+      }
+
+      const updatedVotes = [...votes, vote];
+      setVotes(updatedVotes);
+      setErrorMessage("");
+      setAttendanceNumber("");
+      setTargetClass("");
+      setSecondTargetClass("");
+
+      if (updatedVotes.length >= count) {
+        setStep("finished");
+      }
+    });
   }
 
   return (
@@ -187,7 +213,7 @@ export default function VoteRehearsalPage() {
                 </fieldset>
 
                 <InformationNote>
-                  入力内容は送信・保存されません。
+                  投票内容は1人ずつ送信・保存されます。
                 </InformationNote>
 
                 <button
@@ -225,9 +251,10 @@ export default function VoteRehearsalPage() {
                         maxLength={2}
                         placeholder="1〜40で入力してください"
                         value={attendanceNumber}
-                        onChange={(event) =>
-                          setAttendanceNumber(event.target.value)
-                        }
+                        onChange={(event) => {
+                          setAttendanceNumber(event.target.value);
+                          setErrorMessage("");
+                        }}
                       />
                       <span className={styles.inputSuffix}>番</span>
                     </span>
@@ -254,6 +281,18 @@ export default function VoteRehearsalPage() {
                     onChange={setSecondTargetClass}
                   />
 
+                  {isDuplicateAttendanceNumber && (
+                    <InformationNote variant="warning">
+                      {attendanceNumber}番はこの端末ですでに投票済みです。
+                    </InformationNote>
+                  )}
+
+                  {errorMessage && (
+                    <InformationNote variant="warning">
+                      {errorMessage}
+                    </InformationNote>
+                  )}
+
                   <InformationNote variant="warning">
                     この投票は取り消せません。
                     <br />
@@ -265,6 +304,7 @@ export default function VoteRehearsalPage() {
                     type="submit"
                     disabled={
                       !validAttendanceNumber ||
+                      isDuplicateAttendanceNumber ||
                       !targetClass ||
                       !secondTargetClass ||
                       targetClass === secondTargetClass
@@ -300,6 +340,7 @@ export default function VoteRehearsalPage() {
           secondTargetClass={pendingVote.secondTargetClass}
           onCancel={() => setPendingVote(null)}
           onConfirm={confirmVote}
+          isSubmitting={isSubmitting}
         />
       )}
     </main>
