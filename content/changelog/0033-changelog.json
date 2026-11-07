@@ -1,7 +1,5 @@
 {
   "title": "Add a floating site menu",
-  "description": "TODO",
-  "credits": [
-    "@rotarymars"
-  ]
+  "description": "フローティングメニューを全てのページにつけました。",
+  "credits": ["@rotarymars"]
 }
