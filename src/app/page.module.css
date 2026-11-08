@@ -1,0 +1,109 @@
+/* Colors fall back to the navy/yellow palette so the page also works before
+   the shared theme tokens (from the vote UI) land in globals.css. */
+
+.page {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 40px;
+  width: min(100%, 880px);
+  margin: 0 auto;
+  padding: 72px 20px 96px;
+  color: var(--theme-text, #252b50);
+}
+
+.hero {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding-bottom: 32px;
+  border-bottom: 1px solid var(--theme-border, #9b812b);
+}
+
+.eyebrow {
+  color: var(--theme-muted, #424d7e);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+}
+
+.title {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0 18px;
+  font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
+  font-size: clamp(44px, 10vw, 84px);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  line-height: 1.2;
+}
+
+.year {
+  color: var(--theme-progress, #d3b344);
+  font-size: 0.55em;
+  letter-spacing: 0.1em;
+}
+
+.lead {
+  max-width: 34em;
+  color: var(--theme-muted, #424d7e);
+  font-size: 18px;
+  line-height: 1.9;
+}
+
+.links {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 22px 24px;
+  border: 1px solid var(--theme-border, #9b812b);
+  border-radius: 14px;
+  background: var(--theme-surface-soft, #fff1bb);
+  transition:
+    transform 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.card:hover {
+  box-shadow: 0 10px 24px rgba(16, 22, 48, 0.12);
+  transform: translateY(-2px);
+}
+
+.card:focus-visible {
+  outline: 3px solid var(--theme-focus, #424d7e);
+  outline-offset: 3px;
+}
+
+.cardTitle {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.cardDescription {
+  color: var(--theme-muted, #424d7e);
+  line-height: 1.7;
+}
+
+@media (max-width: 600px) {
+  .page {
+    gap: 28px;
+    padding: 48px 16px 96px;
+  }
+
+  .lead {
+    font-size: 16px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card {
+    transition: none;
+  }
+}

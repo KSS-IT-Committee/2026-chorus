@@ -1,0 +1,119 @@
+/* Colors fall back to the navy/yellow palette so the menu also works before
+   the shared theme tokens (from the vote UI) land in globals.css. */
+
+.container {
+  position: fixed;
+  z-index: 20;
+  right: max(16px, env(safe-area-inset-right));
+  bottom: max(16px, env(safe-area-inset-bottom));
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+.toggle {
+  display: flex;
+  min-height: 52px;
+  align-items: center;
+  gap: 10px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--theme-accent, #424d7e);
+  box-shadow: 0 8px 24px rgba(16, 22, 48, 0.28);
+  color: var(--theme-button-text, #fff9df);
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.toggle:hover {
+  background: var(--theme-accent-hover, #252b50);
+}
+
+.toggle:focus-visible,
+.link:focus-visible {
+  outline: 3px solid var(--theme-focus, #d3b344);
+  outline-offset: 3px;
+}
+
+.icon {
+  position: relative;
+  display: grid;
+  width: 18px;
+  height: 14px;
+  align-content: space-between;
+}
+
+.icon span {
+  display: block;
+  height: 2px;
+  border-radius: 2px;
+  background: currentColor;
+  transition:
+    transform 150ms ease,
+    opacity 150ms ease;
+}
+
+.icon[data-open="true"] span:nth-child(1) {
+  transform: translateY(6px) rotate(45deg);
+}
+
+.icon[data-open="true"] span:nth-child(2) {
+  opacity: 0;
+}
+
+.icon[data-open="true"] span:nth-child(3) {
+  transform: translateY(-6px) rotate(-45deg);
+}
+
+.menu {
+  min-width: 220px;
+  padding: 8px;
+  border: 1px solid var(--theme-border, #9b812b);
+  border-radius: 14px;
+  background: var(--theme-surface, #fff9df);
+  box-shadow: 0 16px 40px rgba(16, 22, 48, 0.25);
+}
+
+.menu[hidden] {
+  display: none;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  list-style: none;
+}
+
+.link {
+  display: block;
+  padding: 12px 14px;
+  border-radius: 9px;
+  color: var(--theme-text, #252b50);
+  font-weight: 700;
+}
+
+.link:hover {
+  background: var(--theme-surface-soft, #fff1bb);
+}
+
+.link[aria-current="page"] {
+  background: var(--theme-highlight, #f0db89);
+  color: var(--theme-highlight-text, #252b50);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .icon span {
+    transition: none;
+  }
+}
+
+@media print {
+  .container {
+    display: none;
+  }
+}
