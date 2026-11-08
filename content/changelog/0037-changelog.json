@@ -1,7 +1,5 @@
 {
-  "title": "Feature/partsschema",
-  "description": "TODO",
-  "credits": [
-    "@Shirym-min"
-  ]
+  "title": "クラスのパートごとの人数",
+  "description": "クラスの各パートごとの人数を登録できるようになりました。",
+  "credits": ["@Shirym-min"]
 }
