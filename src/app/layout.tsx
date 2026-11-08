@@ -4,6 +4,8 @@ import "./globals.css";
 
 import { Footer } from "@/components/Footer";
 
+import { FloatingMenu } from "@/components/FloatingMenu";
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -24,6 +26,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="ja" className={`${geistSans.variable} ${geistMono.variable}`}>
       <body>
         {children}
+        <FloatingMenu />
+
         <Footer />
       </body>
     </html>
