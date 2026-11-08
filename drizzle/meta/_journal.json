@@ -8,6 +8,13 @@
       "when": 1794126674684,
       "tag": "0000_slimy_the_stranger",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1794126991922,
+      "tag": "0001_class_part_counts",
+      "breakpoints": true
     }
   ]
 }

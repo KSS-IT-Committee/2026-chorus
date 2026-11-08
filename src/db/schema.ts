@@ -35,6 +35,22 @@ export const classEnum = pgEnum("class_name", CLASSNAMES);
 
 export const partEnum = pgEnum("part", PARTS);
 
+export const classPartCounts = pgTable(
+  "class_part_counts",
+  {
+    classname: classEnum("classname").notNull(),
+    part: partEnum("part").notNull(),
+    count: integer("count").notNull(),
+  },
+  (table) => [
+    unique("class_part_counts_classname_part_unique").on(
+      table.classname,
+      table.part,
+    ),
+    check("class_part_counts_count_nonnegative", sql`${table.count} >= 0`),
+  ],
+);
+
 export const members = pgTable("members", {
   username: varchar("username", { length: 32 }).primaryKey(),
   password: varchar("password_hash", { length: 60 }).notNull(),
@@ -70,7 +86,6 @@ export const students = pgTable(
     class: varchar("class", { length: 1 }).notNull(),
     classname: classEnum("classname").notNull(),
     attendanceNumber: integer("attendance_number").notNull(),
-    part: partEnum("part").notNull(),
   },
   (table) => [
     unique("students_grade_class_number_unique").on(
