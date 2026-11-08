@@ -56,7 +56,8 @@ export function FloatingMenu() {
         id={menuId}
         className={styles.menu}
         aria-label="サイトメニュー"
-        hidden={!isOpen}
+        data-open={isOpen}
+        inert={!isOpen}
       >
         <ul className={styles.list}>
           {MENU_ITEMS.map((item) => {
