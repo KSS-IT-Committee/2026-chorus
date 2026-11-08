@@ -4,6 +4,8 @@ import "./globals.css";
 
 import { Footer } from "@/components/Footer";
 
+import { FloatingMenu } from "@/components/FloatingMenu";
+
 const notoSansJP = Noto_Sans_JP({
   variable: "--font-noto-sans-jp",
   subsets: ["latin"],
@@ -32,6 +34,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body>
         {children}
+        <FloatingMenu />
+
         <Footer />
       </body>
     </html>
