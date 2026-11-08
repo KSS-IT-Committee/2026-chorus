@@ -1,6 +1,6 @@
 {
   "title": "Add getFreeSong(grade, class) and class-name helpers",
-  "description": "TODO",
+  "description": "getFreeSontとclass-name helperを追加",
   "credits": [
     "@rotarymars"
   ]
