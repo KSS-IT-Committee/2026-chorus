@@ -1,0 +1,80 @@
+.field {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.labelText {
+  color: var(--theme-text);
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.selectWrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.selectWrap::after {
+  position: absolute;
+  top: 50%;
+  right: 17px;
+  width: 9px;
+  height: 9px;
+  border-right: 1.5px solid var(--theme-muted);
+  border-bottom: 1.5px solid var(--theme-muted);
+  content: "";
+  pointer-events: none;
+  transform: translateY(-70%) rotate(45deg);
+}
+
+.selectWrap select {
+  width: 100%;
+  min-width: 0;
+  height: 56px;
+  padding: 0 42px 0 16px;
+  border: 1px solid var(--theme-border);
+  border-radius: 8px;
+  outline: none;
+  appearance: none;
+  background: var(--theme-input-surface);
+  color: var(--theme-input-text);
+  font: inherit;
+  font-size: 18px;
+  color-scheme: inherit;
+  cursor: pointer;
+  transition:
+    border-color 150ms ease,
+    box-shadow 150ms ease;
+}
+
+.selectWrap select:invalid {
+  color: var(--theme-muted);
+}
+
+.selectWrap select option {
+  background: var(--theme-input-surface);
+  color: var(--theme-input-text);
+}
+
+.selectWrap select option[value=""] {
+  color: var(--theme-muted);
+}
+
+.selectWrap select:invalid,
+.selectWrap select option[value=""] {
+  color: var(--theme-muted) !important;
+}
+
+.selectWrap select:focus {
+  border-color: var(--theme-accent);
+  box-shadow: 0 0 0 3px rgba(86, 101, 165, 0.16);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .selectWrap select {
+    transition: none;
+  }
+}
