@@ -12,6 +12,8 @@
     "lint:fix": "eslint --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
     "fix": "npm run lint:fix && npm run format"
   },
   "dependencies": {
