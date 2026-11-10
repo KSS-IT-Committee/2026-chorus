@@ -1,7 +1,5 @@
 {
   "title": "リハーサル用投票機能の実装",
-  "description": "TODO",
-  "credits": [
-    "@SakaYq4875"
-  ]
+  "description": "リハーサル用の投票機能のバックエンドを実装しました。",
+  "credits": ["@SakaYq4875"]
 }
