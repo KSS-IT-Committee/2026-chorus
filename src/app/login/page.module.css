@@ -1,0 +1,58 @@
+.page {
+  flex: 1;
+  width: min(100%, 480px);
+  margin: 0 auto;
+  padding: 72px 20px 96px;
+  color: var(--theme-text, #252b50);
+}
+.panel {
+  border-top: 3px solid var(--theme-progress, #d3b344);
+  padding-top: 28px;
+}
+.panel h1 {
+  font-family: "Yu Mincho", "Hiragino Mincho ProN", serif;
+  font-size: 28px;
+  font-weight: 600;
+}
+.form {
+  display: grid;
+  gap: 10px;
+  margin-top: 32px;
+}
+.form label {
+  font-weight: 700;
+  margin-top: 12px;
+}
+.form input {
+  width: 100%;
+  min-height: 48px;
+  padding: 10px 12px;
+  border: 1px solid var(--theme-border, #9b812b);
+  border-radius: 6px;
+  background: var(--theme-surface, #fff);
+  color: inherit;
+  font: inherit;
+}
+.form button {
+  min-height: 48px;
+  margin-top: 18px;
+  border: 0;
+  border-radius: 6px;
+  background: var(--theme-accent, #424d7e);
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+.form button:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+.form :is(input, button):focus-visible {
+  outline: 3px solid var(--theme-focus, #424d7e);
+  outline-offset: 3px;
+}
+.error {
+  color: var(--theme-text, #9b1c1c);
+  line-height: 1.6;
+}
