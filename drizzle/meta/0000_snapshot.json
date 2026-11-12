@@ -1,5 +1,5 @@
 {
-  "id": "f38fd9c0-47de-4ae9-a903-6bdc16a419f6",
+  "id": "fc3b4446-a3f5-4318-92cb-e52f70e35b33",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -227,6 +227,13 @@
           "type": "integer",
           "primaryKey": false,
           "notNull": true
+        },
+        "part": {
+          "name": "part",
+          "type": "part",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true
         }
       },
       "indexes": {},
@@ -360,6 +367,11 @@
         "3C",
         "3D"
       ]
+    },
+    "public.part": {
+      "name": "part",
+      "schema": "public",
+      "values": ["Soprano", "Alto", "Tenor", "Bass"]
     }
   },
   "schemas": {},
