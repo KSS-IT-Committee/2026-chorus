@@ -53,6 +53,20 @@
   outline-offset: 3px;
 }
 .error {
-  color: var(--theme-text, #9b1c1c);
+  color: var(--theme-error, #9b1c1c);
   line-height: 1.6;
+}
+
+.unauthorizedLink {
+  margin-top: 30px;
+  color: var(--theme-accent, #424d7e);
+  padding: 20px;
+  background-color: #252b50;
+  text-decoration: none;
+  border-radius: 10px;
+}
+
+.loginButtonContainer {
+  display: flex;
+  justify-content: center;
 }

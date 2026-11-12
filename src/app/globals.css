@@ -1,6 +1,19 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  --theme-text: #252b50;
+  --theme-muted: #424d7e;
+  --theme-progress: #d3b344;
+  --theme-border: #9b812b;
+  --theme-surface: #fff9df;
+  --theme-surface-soft: #fff1bb;
+  --theme-accent: #424d7e;
+  --theme-accent-hover: #252b50;
+  --theme-button-text: #fff9df;
+  --theme-focus: #424d7e;
+  --theme-highlight: #f0db89;
+  --theme-highlight-text: #252b50;
+  --theme-error: #9b1c1c;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -19,6 +32,7 @@
     --theme-focus: #f3d879;
     --theme-highlight: #495578;
     --theme-highlight-text: #f4f1e5;
+    --theme-error: #f4f1e5;
   }
 }
 

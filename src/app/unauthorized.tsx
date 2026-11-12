@@ -6,8 +6,10 @@ export default function Unauthorized() {
     <main className={styles.page}>
       <section className={styles.panel}>
         <h1>ログインが必要です</h1>
-        <p>
-          <Link href="/login">ログイン</Link>
+        <p className={styles.loginButtonContainer}>
+          <Link href="/login" className={styles.unauthorizedLink}>
+            ログイン
+          </Link>
         </p>
       </section>
     </main>
