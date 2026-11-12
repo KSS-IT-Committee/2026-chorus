@@ -10,19 +10,34 @@ export type RegisterVoteResult =
   "created" | "student-not-found" | "already-voted";
 
 function isDuplicateVoteError(error: unknown): boolean {
-  if (typeof error !== "object" || error === null || !("code" in error)) {
-    return false;
+  let current = error;
+  const seen = new Set<object>();
+
+  while (
+    typeof current === "object" &&
+    current !== null &&
+    !seen.has(current)
+  ) {
+    seen.add(current);
+
+    if ("code" in current && current.code === "23505") {
+      const constraint =
+        "constraint" in current ? current.constraint : undefined;
+      const constraintName =
+        "constraint_name" in current ? current.constraint_name : undefined;
+
+      if (
+        constraint === "votes_student_grade_unique" ||
+        constraintName === "votes_student_grade_unique"
+      ) {
+        return true;
+      }
+    }
+
+    current = "cause" in current ? current.cause : undefined;
   }
 
-  if (error.code !== "23505") return false;
-
-  const constraint =
-    "constraint_name" in error ? error.constraint_name : undefined;
-  const legacyConstraint = "constraint" in error ? error.constraint : undefined;
-  return (
-    constraint === "votes_student_grade_unique" ||
-    legacyConstraint === "votes_student_grade_unique"
-  );
+  return false;
 }
 
 export async function registerVote(
