@@ -15,6 +15,13 @@
       "when": 1794489630129,
       "tag": "0001_workable_sunfire",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1794490676073,
+      "tag": "0002_regular_johnny_blaze",
+      "breakpoints": true
     }
   ]
 }
