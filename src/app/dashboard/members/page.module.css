@@ -1,0 +1,11 @@
+.main {
+  flex: 1;
+  width: min(100%, 1200px);
+  margin: 0 auto;
+  padding: 72px 20px 96px;
+}
+
+.title {
+  font-size: 2rem;
+  padding: 0.5rem 0;
+}

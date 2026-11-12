@@ -37,7 +37,7 @@ async function DashboardContent() {
       <nav className={styles.pageList} aria-label="ページ一覧">
         {pageList.map((page) => (
           <div key={page.href} className={styles.pageListItem}>
-            <Link href={page.href} className={styles.pageLink}>
+            <Link href={"/dashboard" + page.href} className={styles.pageLink}>
               {page.title}
             </Link>
           </div>
