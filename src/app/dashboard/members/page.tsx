@@ -29,7 +29,10 @@ async function MembersContent() {
           <strong>admin</strong>：全ての操作が可能です。委員アカウントの作成・削除も可能です。
         </li>
         <li>
-          <strong>operator</strong>：memberの権限に加え、曲目登録、生徒名簿登録、特定の投票の削除等が可能です。
+          <strong>operator</strong>：editorの権限に加え、特定の投票の削除等が可能です。
+        </li>
+        <li>
+          <strong>editor</strong>：memberの権限に加え、曲目登録、生徒名簿登録が可能です。
         </li>
         <li>
           <strong>member</strong>：投票結果の閲覧、操作履歴の閲覧が可能です。
