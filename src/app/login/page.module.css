@@ -35,6 +35,7 @@
 }
 .form button {
   min-height: 48px;
+  width: 30%;
   margin-top: 18px;
   border: 0;
   border-radius: 6px;
@@ -43,6 +44,7 @@
   font: inherit;
   font-weight: 700;
   cursor: pointer;
+  margin: 18px auto;
 }
 .form button:disabled {
   opacity: 0.65;
@@ -59,11 +61,20 @@
 
 .unauthorizedLink {
   margin-top: 30px;
-  color: var(--theme-accent, #424d7e);
-  padding: 20px;
-  background-color: #252b50;
-  text-decoration: none;
-  border-radius: 10px;
+  padding: 14px 24px;
+  border-radius: 6px;
+  background: var(--theme-login-link-background);
+  color: var(--theme-login-link-text);
+  font-weight: 700;
+}
+
+.unauthorizedLink:hover {
+  background: var(--theme-login-link-hover);
+}
+
+.unauthorizedLink:focus-visible {
+  outline: 3px solid var(--theme-focus);
+  outline-offset: 3px;
 }
 
 .loginButtonContainer {

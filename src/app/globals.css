@@ -10,6 +10,9 @@
   --theme-accent: #424d7e;
   --theme-accent-hover: #252b50;
   --theme-button-text: #fff9df;
+  --theme-login-link-background: #424d7e;
+  --theme-login-link-hover: #252b50;
+  --theme-login-link-text: #fff9df;
   --theme-focus: #424d7e;
   --theme-highlight: #f0db89;
   --theme-highlight-text: #252b50;
@@ -29,6 +32,9 @@
     --theme-accent: #465381;
     --theme-accent-hover: #536195;
     --theme-button-text: #fff9df;
+    --theme-login-link-background: #e6c65d;
+    --theme-login-link-hover: #f3d879;
+    --theme-login-link-text: #252b50;
     --theme-focus: #f3d879;
     --theme-highlight: #495578;
     --theme-highlight-text: #f4f1e5;
