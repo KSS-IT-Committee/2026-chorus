@@ -3,9 +3,128 @@
   width: min(100%, 1200px);
   margin: 0 auto;
   padding: 72px 20px 96px;
+  color: var(--theme-text);
 }
 
 .title {
-  font-size: 2rem;
-  padding: 0.5rem 0;
+  font-size: clamp(1.6rem, 3vw, 2rem);
+  line-height: 1.35;
+}
+
+.content {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(260px, 340px);
+  gap: clamp(32px, 6vw, 80px);
+  align-items: start;
+  margin-top: 48px;
+}
+
+.subtitle {
+  font-size: 1.125rem;
+  line-height: 1.5;
+}
+
+.pageList {
+  margin-top: 18px;
+  list-style: none;
+  border-top: 2px solid var(--theme-progress);
+}
+
+.pageListItem {
+  border-bottom: 1px solid var(--theme-border);
+}
+
+.pageLink {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 64px;
+  padding: 14px 16px;
+  color: var(--theme-text);
+  transition: background 0.2s ease-in-out;
+}
+
+.username {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-weight: 700;
+}
+
+.permission {
+  color: var(--theme-muted);
+  font-size: 0.875rem;
+}
+
+.pageLink::after {
+  content: "→";
+  font-size: 1.125rem;
+}
+
+.pageLink:hover {
+  background: var(--theme-surface-soft);
+}
+
+.pageLink:focus-visible {
+  outline: 3px solid var(--theme-focus);
+  outline-offset: -3px;
+}
+
+.empty {
+  margin-top: 18px;
+  padding: 20px 0;
+  border-top: 2px solid var(--theme-progress);
+  color: var(--theme-muted);
+}
+
+.roles {
+  padding-top: 3px;
+}
+
+.roleList {
+  margin-top: 18px;
+  border-top: 1px solid var(--theme-border);
+}
+
+.roleList > div {
+  padding: 14px 0;
+  border-bottom: 1px solid var(--theme-border);
+}
+
+.roleList dt {
+  font-weight: 700;
+  font-size: 0.875rem;
+}
+
+.roleList dd,
+.roleNote {
+  margin-top: 5px;
+  color: var(--theme-muted);
+  font-size: 0.875rem;
+  line-height: 1.7;
+}
+
+.roleNote {
+  margin-top: 18px;
+}
+
+@media (max-width: 700px) {
+  .main {
+    padding: 40px 20px 80px;
+  }
+
+  .content {
+    grid-template-columns: minmax(0, 1fr);
+    margin-top: 32px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pageLink {
+    transition: none;
+  }
+}
+
+.titleContainer {
+  display: flex;
 }
