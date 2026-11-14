@@ -106,6 +106,7 @@ export const votes = pgTable(
     grade: integer("grade").notNull(),
     firstClass: classEnum("first_class").notNull(),
     secondClass: classEnum("second_class").notNull(),
+    invalid: boolean("invalid").notNull().default(false),
     votedAt: timestamp("voted_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
