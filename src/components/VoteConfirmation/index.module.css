@@ -68,6 +68,13 @@
   text-align: left;
 }
 
+.error {
+  margin-top: 20px;
+  color: #b42318;
+  font-weight: 700;
+  line-height: 1.6;
+}
+
 .actions {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -104,6 +111,13 @@
 .cancel:hover,
 .confirm:hover {
   transform: translateY(-1px);
+}
+
+.cancel:disabled,
+.confirm:disabled {
+  cursor: wait;
+  opacity: 0.7;
+  transform: none;
 }
 
 .cancel:hover {

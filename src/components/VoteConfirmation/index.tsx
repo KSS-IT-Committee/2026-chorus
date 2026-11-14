@@ -6,8 +6,10 @@ type VoteConfirmationProps = {
   attendanceNumber: number;
   targetClass: string;
   secondTargetClass: string;
+  error: string | null;
+  isSubmitting: boolean;
   onCancel: () => void;
-  onConfirm: () => void;
+  onConfirm: () => void | Promise<void>;
 };
 
 export default function VoteConfirmation({
@@ -15,6 +17,8 @@ export default function VoteConfirmation({
   attendanceNumber,
   targetClass,
   secondTargetClass,
+  error,
+  isSubmitting,
   onCancel,
   onConfirm,
 }: VoteConfirmationProps) {
@@ -37,7 +41,7 @@ export default function VoteConfirmation({
   function handleDialogKeyDown(event: KeyboardEvent<HTMLElement>) {
     if (event.key === "Escape") {
       event.preventDefault();
-      onCancel();
+      if (!isSubmitting) onCancel();
       return;
     }
 
@@ -95,17 +99,28 @@ export default function VoteConfirmation({
             </dd>
           </div>
         </dl>
+        {error && (
+          <p className={styles.error} role="alert">
+            {error}
+          </p>
+        )}
         <div className={styles.actions}>
           <button
             className={styles.cancel}
             type="button"
             ref={cancelButtonRef}
+            disabled={isSubmitting}
             onClick={onCancel}
           >
             戻って修正する
           </button>
-          <button className={styles.confirm} type="button" onClick={onConfirm}>
-            投票を確定する
+          <button
+            className={styles.confirm}
+            type="button"
+            disabled={isSubmitting}
+            onClick={onConfirm}
+          >
+            {isSubmitting ? "送信中…" : "投票を確定する"}
           </button>
         </div>
       </section>

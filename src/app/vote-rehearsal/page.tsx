@@ -16,6 +16,7 @@ const parts = ["ソプラノ", "アルト", "テノール", "バス"] as const;
 type Grade = (typeof grades)[number];
 type ClassName = (typeof classes)[number];
 type Vote = {
+  requestId: string;
   attendanceNumber: number;
   targetClass: ClassName;
   secondTargetClass: ClassName;
@@ -34,6 +35,8 @@ export default function VoteRehearsalPage() {
   ); // 2番目の投票先
   const [pendingVote, setPendingVote] = useState<Vote | null>(null); // 投票内容の一時保存
   const [votes, setVotes] = useState<Vote[]>([]); // 投票内容の保存
+  const [voteError, setVoteError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const count = Number(memberCount);
   const validCount = Number.isInteger(count) && count >= 1 && count <= 40;
@@ -75,24 +78,69 @@ export default function VoteRehearsalPage() {
     }
 
     setPendingVote({
+      requestId: crypto.randomUUID(),
       attendanceNumber: Number(attendanceNumber),
       targetClass,
       secondTargetClass,
     });
+    setVoteError(null);
   }
 
-  function confirmVote() {
-    if (!pendingVote) return;
+  async function confirmVote() {
+    if (!pendingVote || !grade || !className || isSubmitting) return;
 
-    const updatedVotes = [...votes, pendingVote];
-    setVotes(updatedVotes);
-    setAttendanceNumber("");
-    setTargetClass("");
-    setSecondTargetClass("");
-    setPendingVote(null);
+    setIsSubmitting(true);
+    setVoteError(null);
+    try {
+      const response = await fetch("/api/votes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          requestId: pendingVote.requestId,
+          grade,
+          className,
+          attendanceNumber: pendingVote.attendanceNumber,
+          firstClass: pendingVote.targetClass,
+          secondClass: pendingVote.secondTargetClass,
+        }),
+      });
+      const result: unknown = await response.json().catch(() => null);
+      if (!response.ok) {
+        const errorCode =
+          typeof result === "object" &&
+          result !== null &&
+          "error" in result &&
+          typeof result.error === "string"
+            ? result.error
+            : "";
+        setVoteError(
+          errorCode === "STUDENT_NOT_FOUND"
+            ? "この学年・クラス・出席番号は名簿に見つかりません。入力内容を確認してください。"
+            : errorCode === "ALREADY_VOTED"
+              ? "この生徒の投票はすでに登録されています。委員に確認してください。"
+              : errorCode === "INVALID_VOTE"
+                ? "投票内容を確認してください。"
+                : errorCode === "IDEMPOTENCY_CONFLICT"
+                  ? "送信IDと投票内容が一致しません。最初からやり直してください。"
+                  : "投票を保存できませんでした。時間をおいて再度お試しください。",
+        );
+        return;
+      }
 
-    if (updatedVotes.length >= count) {
-      setStep("finished");
+      const updatedVotes = [...votes, pendingVote];
+      setVotes(updatedVotes);
+      setAttendanceNumber("");
+      setTargetClass("");
+      setSecondTargetClass("");
+      setPendingVote(null);
+
+      if (updatedVotes.length >= count) {
+        setStep("finished");
+      }
+    } catch {
+      setVoteError("通信に失敗しました。接続を確認して再度お試しください。");
+    } finally {
+      setIsSubmitting(false);
     }
   }
 
@@ -187,7 +235,7 @@ export default function VoteRehearsalPage() {
                 </fieldset>
 
                 <InformationNote>
-                  入力内容は送信・保存されません。
+                  投票を確定すると、名簿と照合したうえでデータベースに保存されます。
                 </InformationNote>
 
                 <button
@@ -298,7 +346,12 @@ export default function VoteRehearsalPage() {
           attendanceNumber={pendingVote.attendanceNumber}
           targetClass={pendingVote.targetClass}
           secondTargetClass={pendingVote.secondTargetClass}
-          onCancel={() => setPendingVote(null)}
+          error={voteError}
+          isSubmitting={isSubmitting}
+          onCancel={() => {
+            setPendingVote(null);
+            setVoteError(null);
+          }}
           onConfirm={confirmVote}
         />
       )}
