@@ -1,14 +1,13 @@
 import { stdin, stdout } from "node:process";
 import postgres from "postgres";
 import { hashPassword } from "../src/lib/password.ts";
+import {
+  isValidNewPassword,
+  isValidUsername,
+} from "../src/lib/account-validation.ts";
 
 const username = process.argv[2];
-if (
-  !username ||
-  username.length > 32 ||
-  !process.env.DATABASE_URL ||
-  !stdin.isTTY
-) {
+if (!isValidUsername(username) || !process.env.DATABASE_URL || !stdin.isTTY) {
   console.error(
     "Usage: DATABASE_URL=... node scripts/create-member.mjs <username> (interactive terminal required)",
   );
@@ -32,9 +31,9 @@ try {
   stdin.setRawMode(false);
   stdout.write("\n");
 }
-if (password.length < 8 || Buffer.byteLength(password) > 1024)
+if (!isValidNewPassword(password))
   throw new Error(
-    "Password must be at least 8 characters and at most 1024 bytes",
+    "Password must be 8 to 1024 printable ASCII characters without spaces",
   );
 const sql = postgres(process.env.DATABASE_URL, { max: 1 });
 try {

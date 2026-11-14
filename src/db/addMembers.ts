@@ -3,18 +3,21 @@ import "server-only";
 import { members, PERMISSION } from "@/db/schema";
 import { db } from "@/lib/db";
 import { hashPassword } from "@/lib/password";
+import { isValidNewPassword, isValidUsername } from "@/lib/account-validation";
 
 export async function addMembers(
   username: string,
   password: string,
   permission: (typeof PERMISSION)[number],
 ) {
-  if (!username || username.length > 32) {
-    throw new Error("Username must be between 1 and 32 characters");
-  }
-  if (password.length < 8 || Buffer.byteLength(password) > 1024) {
+  if (!isValidUsername(username)) {
     throw new Error(
-      "Password must be at least 8 characters and at most 1024 bytes",
+      "Username must be 1 to 32 printable ASCII characters without spaces",
+    );
+  }
+  if (!isValidNewPassword(password)) {
+    throw new Error(
+      "Password must be 8 to 1024 printable ASCII characters without spaces",
     );
   }
   if (!PERMISSION.includes(permission)) {

@@ -25,8 +25,13 @@ export function ChangePasswordForm() {
         type="password"
         autoComplete="new-password"
         minLength={8}
+        maxLength={1024}
+        pattern={"[\\x21-\\x7E]+"}
+        title="半角英数字と記号を入力してください。"
+        aria-describedby="new-password-hint"
         required
       />
+      <p id="new-password-hint">半角英数字と記号で8文字以上、1024文字以下</p>
       <label htmlFor="confirmation">新しいパスワード（確認）</label>
       <input
         id="confirmation"
@@ -34,6 +39,9 @@ export function ChangePasswordForm() {
         type="password"
         autoComplete="new-password"
         minLength={8}
+        maxLength={1024}
+        pattern={"[\\x21-\\x7E]+"}
+        title="半角英数字と記号を入力してください。"
         required
       />
       {state.error && (

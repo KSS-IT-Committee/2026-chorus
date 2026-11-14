@@ -6,7 +6,7 @@ import { redirect, unauthorized } from "next/navigation";
 import { members, sessions } from "@/db/schema";
 import { db } from "@/lib/db";
 import { hashPassword, verifyPassword } from "@/lib/password";
-import { validatePasswordChange } from "@/lib/password-change";
+import { validatePasswordChange } from "@/lib/account-validation";
 import {
   getCurrentUser,
   SESSION_COOKIE_NAME,

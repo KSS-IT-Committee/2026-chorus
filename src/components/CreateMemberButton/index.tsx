@@ -55,7 +55,9 @@ function CreateMemberForm({ close }: { close: () => void }) {
   return (
     <form action={action} className={styles.form}>
       <h2 id="create-member-title">アカウントを作成</h2>
-      <label>本名などは用いないでください。"3C41"のような形式が推奨です</label>
+      <label>
+        本名などは用いないでください。&quot;3C41&quot;のような形式が推奨です
+      </label>
       <label htmlFor="member-username">ユーザー名</label>
       <input
         id="member-username"
@@ -64,9 +66,15 @@ function CreateMemberForm({ close }: { close: () => void }) {
         onChange={(event) => setUsername(event.target.value)}
         autoComplete="off"
         maxLength={32}
+        pattern={"[\\x21-\\x7E]+"}
+        title="半角英数字と記号を入力してください。"
+        aria-describedby="username-hint"
         required
         autoFocus
       />
+      <p id="username-hint" className={styles.hint}>
+        半角英数字と記号、32文字以下
+      </p>
       <label htmlFor="member-password">初期パスワード</label>
       <input
         id="member-password"
@@ -76,11 +84,14 @@ function CreateMemberForm({ close }: { close: () => void }) {
         type="password"
         autoComplete="new-password"
         minLength={8}
+        maxLength={1024}
+        pattern={"[\\x21-\\x7E]+"}
+        title="半角英数字と記号を入力してください。"
         required
         aria-describedby="password-hint"
       />
       <p id="password-hint" className={styles.hint}>
-        8文字以上、1024バイト以下
+        半角英数字と記号、8文字以上1024文字以下
       </p>
       <label htmlFor="member-permission">権限</label>
       <select

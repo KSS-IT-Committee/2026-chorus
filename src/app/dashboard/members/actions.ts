@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { addMembers } from "@/db/addMembers";
 import { PERMISSION } from "@/db/schema";
 import { getCurrentUser } from "@/lib/session";
+import { isValidNewPassword, isValidUsername } from "@/lib/account-validation";
 
 export async function createMemberAction(
   _state: { error: string | null; success: boolean },
@@ -19,19 +20,17 @@ export async function createMemberAction(
   const permission = PERMISSION.find(
     (value) => value === formData.get("permission"),
   );
-  if (typeof username !== "string" || !username || username.length > 32) {
+  if (!isValidUsername(username)) {
     return {
-      error: "ユーザー名は1文字以上32文字以下で入力してください。",
+      error:
+        "ユーザー名は半角英数字と記号で1文字以上32文字以下にしてください。",
       success: false,
     };
   }
-  if (
-    typeof password !== "string" ||
-    password.length < 8 ||
-    Buffer.byteLength(password) > 1024
-  ) {
+  if (!isValidNewPassword(password)) {
     return {
-      error: "パスワードは8文字以上、1024バイト以下で入力してください。",
+      error:
+        "パスワードは半角英数字と記号で8文字以上、1024文字以下にしてください。",
       success: false,
     };
   }
