@@ -16,6 +16,7 @@ const parts = ["ソプラノ", "アルト", "テノール", "バス"] as const;
 type Grade = (typeof grades)[number];
 type ClassName = (typeof classes)[number];
 type Vote = {
+  requestId: string;
   attendanceNumber: number;
   targetClass: ClassName;
   secondTargetClass: ClassName;
@@ -77,6 +78,7 @@ export default function VoteRehearsalPage() {
     }
 
     setPendingVote({
+      requestId: crypto.randomUUID(),
       attendanceNumber: Number(attendanceNumber),
       targetClass,
       secondTargetClass,
@@ -94,6 +96,7 @@ export default function VoteRehearsalPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          requestId: pendingVote.requestId,
           grade,
           className,
           attendanceNumber: pendingVote.attendanceNumber,
@@ -117,7 +120,9 @@ export default function VoteRehearsalPage() {
               ? "この生徒の投票はすでに登録されています。委員に確認してください。"
               : errorCode === "INVALID_VOTE"
                 ? "投票内容を確認してください。"
-                : "投票を保存できませんでした。時間をおいて再度お試しください。",
+                : errorCode === "IDEMPOTENCY_CONFLICT"
+                  ? "送信IDと投票内容が一致しません。最初からやり直してください。"
+                  : "投票を保存できませんでした。時間をおいて再度お試しください。",
         );
         return;
       }

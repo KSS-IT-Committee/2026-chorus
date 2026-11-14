@@ -7,9 +7,13 @@ import { db, type Executor } from "@/lib/db";
 import type { VoteSubmission } from "@/lib/vote-validation";
 
 export type RegisterVoteResult =
-  "created" | "student-not-found" | "already-voted";
+  | "created"
+  | "replayed"
+  | "student-not-found"
+  | "already-voted"
+  | "idempotency-conflict";
 
-function isDuplicateVoteError(error: unknown): boolean {
+function getDuplicateConstraint(error: unknown): string | undefined {
   let current = error;
   const seen = new Set<object>();
 
@@ -26,18 +30,14 @@ function isDuplicateVoteError(error: unknown): boolean {
       const constraintName =
         "constraint_name" in current ? current.constraint_name : undefined;
 
-      if (
-        constraint === "votes_student_grade_unique" ||
-        constraintName === "votes_student_grade_unique"
-      ) {
-        return true;
-      }
+      if (typeof constraint === "string") return constraint;
+      if (typeof constraintName === "string") return constraintName;
     }
 
     current = "cause" in current ? current.cause : undefined;
   }
 
-  return false;
+  return undefined;
 }
 
 export async function registerVote(
@@ -57,15 +57,45 @@ export async function registerVote(
 
   if (!student) return "student-not-found";
 
+  const vote = {
+    studentId: student.id,
+    grade: submission.grade,
+    firstClass: submission.firstClass,
+    secondClass: submission.secondClass,
+    requestId: submission.requestId,
+  };
+
   try {
-    await executor.insert(votes).values({
-      studentId: student.id,
-      grade: submission.grade,
-      firstClass: submission.firstClass,
-      secondClass: submission.secondClass,
-    });
+    await executor.insert(votes).values(vote);
   } catch (error) {
-    if (isDuplicateVoteError(error)) return "already-voted";
+    const constraint = getDuplicateConstraint(error);
+    if (
+      constraint === "votes_student_grade_unique" ||
+      constraint === "votes_request_id_unique"
+    ) {
+      const [existingRequest] = await executor
+        .select({
+          studentId: votes.studentId,
+          grade: votes.grade,
+          firstClass: votes.firstClass,
+          secondClass: votes.secondClass,
+        })
+        .from(votes)
+        .where(eq(votes.requestId, submission.requestId))
+        .limit(1);
+
+      if (existingRequest) {
+        return existingRequest.studentId === student.id &&
+          existingRequest.grade === submission.grade &&
+          existingRequest.firstClass === submission.firstClass &&
+          existingRequest.secondClass === submission.secondClass
+          ? "replayed"
+          : "idempotency-conflict";
+      }
+
+      if (constraint === "votes_student_grade_unique") return "already-voted";
+    }
+
     throw error;
   }
 

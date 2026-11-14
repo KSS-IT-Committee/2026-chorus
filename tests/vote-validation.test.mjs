@@ -19,12 +19,14 @@ test("parses a valid vote and normalizes its class names", () => {
   assert.deepEqual(
     parseVoteSubmission({
       grade: "2",
+      requestId: "123e4567-e89b-42d3-a456-426614174000",
       className: "a",
       attendanceNumber: 12,
       firstClass: "B",
       secondClass: "D",
     }),
     {
+      requestId: "123e4567-e89b-42d3-a456-426614174000",
       grade: 2,
       classname: "2A",
       attendanceNumber: 12,
@@ -39,6 +41,7 @@ test("rejects malformed or out-of-range voter data", () => {
     assert.equal(
       parseVoteSubmission({
         grade: 1,
+        requestId: "123e4567-e89b-42d3-a456-426614174000",
         className: "A",
         attendanceNumber,
         firstClass: "B",
@@ -52,6 +55,7 @@ test("rejects malformed or out-of-range voter data", () => {
   assert.equal(
     parseVoteSubmission({
       grade: "4",
+      requestId: "123e4567-e89b-42d3-a456-426614174000",
       className: "A",
       attendanceNumber: 1,
       firstClass: "B",
@@ -64,6 +68,7 @@ test("rejects malformed or out-of-range voter data", () => {
 test("rejects same-class, self-class, and invalid-class choices", () => {
   const input = {
     grade: 1,
+    requestId: "123e4567-e89b-42d3-a456-426614174000",
     className: "A",
     attendanceNumber: 1,
     firstClass: "B",
@@ -73,4 +78,20 @@ test("rejects same-class, self-class, and invalid-class choices", () => {
   assert.equal(parseVoteSubmission({ ...input, secondClass: "B" }), null);
   assert.equal(parseVoteSubmission({ ...input, firstClass: "A" }), null);
   assert.equal(parseVoteSubmission({ ...input, secondClass: "E" }), null);
+});
+
+test("requires a UUID request identifier", () => {
+  const input = {
+    grade: 1,
+    requestId: "123e4567-e89b-42d3-a456-426614174000",
+    className: "A",
+    attendanceNumber: 1,
+    firstClass: "B",
+    secondClass: "C",
+  };
+
+  assert.equal(
+    parseVoteSubmission({ ...input, requestId: "not-a-uuid" }),
+    null,
+  );
 });

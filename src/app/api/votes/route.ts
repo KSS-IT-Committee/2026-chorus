@@ -22,8 +22,14 @@ export async function POST(request: Request) {
     if (result === "already-voted") {
       return Response.json({ error: "ALREADY_VOTED" }, { status: 409 });
     }
+    if (result === "idempotency-conflict") {
+      return Response.json({ error: "IDEMPOTENCY_CONFLICT" }, { status: 409 });
+    }
 
-    return Response.json({ ok: true }, { status: 201 });
+    return Response.json(
+      { ok: true, replayed: result === "replayed" },
+      { status: result === "created" ? 201 : 200 },
+    );
   } catch (error) {
     console.error("Could not save vote", error);
     return Response.json({ error: "INTERNAL_ERROR" }, { status: 500 });

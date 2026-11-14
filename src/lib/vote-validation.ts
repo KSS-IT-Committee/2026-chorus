@@ -1,6 +1,7 @@
 import { isGrade, toClassName } from "@/lib/class-name";
 
 export type VoteSubmission = {
+  requestId: string;
   grade: number;
   classname: NonNullable<ReturnType<typeof toClassName>>;
   attendanceNumber: number;
@@ -14,6 +15,15 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 export function parseVoteSubmission(value: unknown): VoteSubmission | null {
   if (!isRecord(value)) return null;
+
+  if (
+    typeof value.requestId !== "string" ||
+    !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+      value.requestId,
+    )
+  ) {
+    return null;
+  }
 
   const grade =
     typeof value.grade === "number"
@@ -51,6 +61,7 @@ export function parseVoteSubmission(value: unknown): VoteSubmission | null {
   }
 
   return {
+    requestId: value.requestId,
     grade,
     classname,
     attendanceNumber: value.attendanceNumber,
