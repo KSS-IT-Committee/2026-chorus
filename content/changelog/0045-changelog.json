@@ -1,7 +1,5 @@
 {
   "title": "投票機能の改善",
   "description": "管理者による投票管理を改善しました。",
-  "credits": [
-    "@Shirym-min"
-  ]
+  "credits": ["@Shirym-min"]
 }
