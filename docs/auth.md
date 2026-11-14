@@ -6,6 +6,8 @@
 DATABASE_URL='postgresql://...' node scripts/create-member.mjs USERNAME
 ```
 
-既存のユーザー名は上書きされません。パスワードは scrypt でハッシュ化され、ログインに成功すると2日間有効なセッションを作成します。`getCurrentUser()` は有効なセッションの `{ username }` を返し、未ログインの場合は `null` を返します。保護するページ、Server Action、Route Handler はそれぞれ認証を確認してください。
+既存のユーザー名は上書きされません。パスワードは scrypt でハッシュ化され、ログインに成功すると2日間有効なセッションを作成します。`getCurrentUser()` は有効なセッションの `{ username, permission }` を返し、未ログインの場合は `null` を返します。保護するページ、Server Action、Route Handler はそれぞれ認証を確認してください。
+
+`Internal` は `minimumPermission` に指定した権限以上のメンバーに子要素を表示します。権限は高い順に `admin`、`operator`、`editor`、`member` です。表示の制限とは別に、データの取得や変更を行う処理でも権限を確認してください。
 
 ログイン試行回数の制限はプロセス単位です。複数台で運用する場合は共有の制限機構が必要です。また、大量の異なるユーザー名による試行を防ぐため、公開環境ではリバースプロキシなどでもリクエスト数を制限してください。

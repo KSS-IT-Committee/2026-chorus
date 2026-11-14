@@ -15,13 +15,11 @@ const hashToken = (token: string) =>
 export async function createSession(username: string): Promise<string> {
   const token = randomBytes(32).toString("base64url");
   await db.delete(sessions).where(lt(sessions.expiresAt, new Date()));
-  await db
-    .insert(sessions)
-    .values({
-      tokenHash: hashToken(token),
-      username,
-      expiresAt: new Date(Date.now() + TTL_SECONDS * 1000),
-    });
+  await db.insert(sessions).values({
+    tokenHash: hashToken(token),
+    username,
+    expiresAt: new Date(Date.now() + TTL_SECONDS * 1000),
+  });
   return token;
 }
 
@@ -31,15 +29,22 @@ export async function invalidateSession(token: string): Promise<void> {
 
 export async function validateSessionToken(
   token: string,
-): Promise<{ username: string } | null> {
+): Promise<{
+  username: string;
+  permission: (typeof members.$inferSelect)["permission"];
+} | null> {
   if (!/^[\w-]{43}$/.test(token)) return null;
   const [session] = await db
-    .select({ username: members.username, expiresAt: sessions.expiresAt })
+    .select({
+      username: members.username,
+      permission: members.permission,
+      expiresAt: sessions.expiresAt,
+    })
     .from(sessions)
     .innerJoin(members, eq(members.username, sessions.username))
     .where(eq(sessions.tokenHash, hashToken(token)));
   if (!session || session.expiresAt.getTime() <= Date.now()) return null;
-  return { username: session.username };
+  return { username: session.username, permission: session.permission };
 }
 
 export const getCurrentUser = cache(async () => {

@@ -7,7 +7,7 @@ export const instant = false;
 export default function MembersPage() {
   return (
     <main className={styles.main}>
-      <AuthGuard>
+      <AuthGuard minimumPermission="admin">
         <MembersContent />
       </AuthGuard>
     </main>
