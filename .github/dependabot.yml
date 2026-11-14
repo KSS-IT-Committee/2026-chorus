@@ -20,3 +20,11 @@ updates:
     directory: "/" # Location of package manifests
     schedule:
       interval: "weekly"
+    # Every workflow pins actions to a full commit SHA (with the tag as a
+    # trailing comment) so a moved tag can't change what CI runs. Dependabot
+    # rewrites both together; grouping keeps each week's bumps in one PR whose
+    # diff is just "old SHA -> new SHA" per action.
+    groups:
+      github-actions:
+        patterns:
+          - "*"

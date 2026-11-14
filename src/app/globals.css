@@ -1,10 +1,59 @@
 :root {
+  /* Palette shades progress from darker (A) to lighter (D). */
+  --YELLOW_A: #d3b344;
+  --YELLOW_B: #f0db89;
+  --YELLOW_C: #fff1bb;
+  --YELLOW_D: #fff9df;
+  --NAVY_A: #101630;
+  --NAVY_B: #171d3a;
+  --NAVY_C: #252b50;
+  --NAVY_D: #424d7e;
+
+  --theme-page-background: var(--YELLOW_D);
+  --theme-text: var(--NAVY_C);
+  --theme-muted: var(--NAVY_D);
+  --theme-strong: var(--NAVY_C);
+  --theme-accent: var(--NAVY_D);
+  --theme-accent-hover: var(--NAVY_C);
+  --theme-border: #9b812b;
+  --theme-surface: var(--YELLOW_D);
+  --theme-surface-soft: var(--YELLOW_C);
+  --theme-input-surface: var(--YELLOW_D);
+  --theme-input-text: var(--NAVY_C);
+  --theme-highlight: var(--YELLOW_B);
+  --theme-highlight-text: var(--NAVY_C);
+  --theme-focus: var(--NAVY_D);
+  --theme-disabled: var(--NAVY_D);
+  --theme-progress: var(--YELLOW_A);
+  --theme-warning: var(--NAVY_C);
+  --theme-button-text: var(--YELLOW_D);
+
   --background: #ffffff;
   --foreground: #171717;
+  color-scheme: light;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
+    --theme-page-background: var(--NAVY_A);
+    --theme-text: var(--YELLOW_D);
+    --theme-muted: var(--YELLOW_C);
+    --theme-strong: var(--YELLOW_D);
+    --theme-accent: var(--YELLOW_A);
+    --theme-accent-hover: var(--YELLOW_B);
+    --theme-border: var(--NAVY_D);
+    --theme-surface: var(--NAVY_B);
+    --theme-surface-soft: var(--NAVY_C);
+    --theme-input-surface: var(--NAVY_A);
+    --theme-input-text: var(--YELLOW_D);
+    --theme-highlight: var(--NAVY_C);
+    --theme-highlight-text: var(--YELLOW_D);
+    --theme-focus: var(--YELLOW_B);
+    --theme-disabled: var(--NAVY_D);
+    --theme-progress: var(--YELLOW_A);
+    --theme-warning: var(--YELLOW_B);
+    --theme-button-text: var(--NAVY_C);
+
     --background: #141a2b;
     --foreground: #f4f1e5;
     --theme-text: #f4f1e5;
@@ -19,6 +68,7 @@
     --theme-focus: #f3d879;
     --theme-highlight: #495578;
     --theme-highlight-text: #f4f1e5;
+    color-scheme: dark;
   }
 }
 
@@ -52,10 +102,4 @@ body {
 a {
   color: inherit;
   text-decoration: none;
-}
-
-@media (prefers-color-scheme: dark) {
-  html {
-    color-scheme: dark;
-  }
 }
