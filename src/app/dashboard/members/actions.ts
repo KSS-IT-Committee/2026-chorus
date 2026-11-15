@@ -2,7 +2,9 @@
 
 import { revalidatePath } from "next/cache";
 import { addMembers } from "@/db/addMembers";
-import { PERMISSION } from "@/db/schema";
+import { auditLogs, PERMISSION } from "@/db/schema";
+import { db } from "@/lib/db";
+import { getAuditReason } from "@/lib/audit-reason";
 import { getCurrentUser } from "@/lib/session";
 import { isValidNewPassword, isValidUsername } from "@/lib/account-validation";
 
@@ -15,6 +17,9 @@ export async function createMemberAction(
     return { error: "アカウントを作成する権限がありません。", success: false };
   }
 
+  const reason = getAuditReason(formData.get("reason"));
+  if (!reason)
+    return { error: "理由を500文字以内で入力してください。", success: false };
   const username = formData.get("username");
   const password = formData.get("password");
   const permission = PERMISSION.find(
@@ -39,7 +44,18 @@ export async function createMemberAction(
   }
 
   try {
-    await addMembers(username, password, permission);
+    await db.transaction(async (tx) => {
+      await addMembers(username, password, permission, tx);
+      await tx
+        .insert(auditLogs)
+        .values({
+          operatorName: user.username,
+          action: "member.create",
+          targetType: "member",
+          targetId: username,
+          details: { reason, permission },
+        });
+    });
   } catch (error) {
     const cause = error instanceof Error ? error.cause : null;
     if (

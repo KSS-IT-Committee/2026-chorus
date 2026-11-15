@@ -75,3 +75,16 @@
     gap: 0 20px;
   }
 }
+
+.manualLink {
+  display: inline-block;
+  margin-top: 16px;
+  color: var(--theme-muted);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.manualLink:focus-visible {
+  outline: 3px solid var(--theme-focus);
+  outline-offset: 3px;
+}

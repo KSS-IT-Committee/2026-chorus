@@ -100,9 +100,9 @@ export const votes = pgTable(
   "votes",
   {
     id: serial("id").primaryKey(),
-    studentId: varchar("student_id", { length: 32 })
-      .notNull()
-      .references(() => students.id),
+    studentId: varchar("student_id", { length: 32 }).references(
+      () => students.id,
+    ),
     grade: integer("grade").notNull(),
     firstClass: classEnum("first_class").notNull(),
     secondClass: classEnum("second_class").notNull(),

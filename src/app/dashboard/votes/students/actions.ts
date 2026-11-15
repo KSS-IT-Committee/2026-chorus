@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { changeVote } from "@/db/votes";
 import { hasMinimumPermission } from "@/lib/permission";
 import { getCurrentUser } from "@/lib/session";
+import { getAuditReason } from "@/lib/audit-reason";
 
 export async function changeVoteAction(
   _state: { error: string | null; success: boolean },
@@ -12,13 +13,15 @@ export async function changeVoteAction(
   const user = await getCurrentUser();
   if (!hasMinimumPermission(user, "operator"))
     return { error: "この操作を行う権限がありません。", success: false };
+  const reason = getAuditReason(formData.get("reason"));
+  if (!reason)
+    return { error: "理由を500文字以内で入力してください。", success: false };
   const studentId = formData.get("studentId");
   const id = formData.get("voteId");
   const operation = formData.get("operation");
   if (
     typeof studentId !== "string" ||
-    !studentId.trim() ||
-    studentId.length > 32 ||
+    (studentId !== "" && (!studentId.trim() || studentId.length > 32)) ||
     typeof id !== "string" ||
     !/^[1-9][0-9]*$/.test(id) ||
     !Number.isSafeInteger(Number(id)) ||
@@ -29,10 +32,11 @@ export async function changeVoteAction(
   }
   try {
     const changed = await changeVote(
-      studentId,
+      studentId === "" ? null : studentId,
       Number(id),
       operation,
       user.username,
+      reason,
     );
     if (!changed)
       return {
@@ -47,6 +51,8 @@ export async function changeVoteAction(
     };
   }
   revalidatePath("/dashboard/votes/students");
+  revalidatePath("/dashboard/votes/manual");
+  revalidatePath("/dashboard/votes/result");
   revalidatePath("/dashboard/votes/students/[studentId]", "page");
   return { error: null, success: true };
 }

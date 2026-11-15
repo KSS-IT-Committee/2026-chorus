@@ -1,7 +1,7 @@
 import "server-only";
 
 import { members, PERMISSION } from "@/db/schema";
-import { db } from "@/lib/db";
+import { db, type Executor } from "@/lib/db";
 import { hashPassword } from "@/lib/password";
 import { isValidNewPassword, isValidUsername } from "@/lib/account-validation";
 
@@ -9,6 +9,7 @@ export async function addMembers(
   username: string,
   password: string,
   permission: (typeof PERMISSION)[number],
+  executor: Executor = db,
 ) {
   if (!isValidUsername(username)) {
     throw new Error(
@@ -24,7 +25,7 @@ export async function addMembers(
     throw new Error("Invalid permission");
   }
 
-  await db.insert(members).values({
+  await executor.insert(members).values({
     username,
     password: await hashPassword(password),
     permission,

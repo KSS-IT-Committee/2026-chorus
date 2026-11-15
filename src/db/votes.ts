@@ -1,6 +1,6 @@
 import "server-only";
 
-import { and, count, eq, sql } from "drizzle-orm";
+import { and, count, desc, eq, isNull, sql } from "drizzle-orm";
 import { auditLogs, students, votes } from "@/db/schema";
 import type { ClassName } from "@/lib/class-name";
 import { db } from "@/lib/db";
@@ -47,13 +47,19 @@ export async function getStudentVotes(studentId: string) {
 }
 
 export async function changeVote(
-  studentId: string,
+  studentId: string | null,
   voteId: number,
   operation: "delete" | "invalidate",
   operatorName: string,
+  reason: string,
 ) {
   return db.transaction(async (tx) => {
-    const condition = and(eq(votes.id, voteId), eq(votes.studentId, studentId));
+    const condition = and(
+      eq(votes.id, voteId),
+      studentId === null
+        ? isNull(votes.studentId)
+        : eq(votes.studentId, studentId),
+    );
     const changed =
       operation === "delete"
         ? await tx
@@ -71,7 +77,7 @@ export async function changeVote(
       action: operation === "delete" ? "vote.delete" : "vote.invalidate",
       targetType: "vote",
       targetId: String(voteId),
-      details: { studentId, grade: changed[0].grade },
+      details: { studentId, grade: changed[0].grade, reason },
     });
     return true;
   });
@@ -91,4 +97,39 @@ export async function getVoteTotals() {
     where ${votes.invalid} = false
     group by selection.class_name
   `);
+}
+
+export async function addManualVote(
+  grade: number,
+  firstClass: ClassName,
+  secondClass: ClassName,
+  operatorName: string,
+  reason: string,
+) {
+  return db.transaction(async (tx) => {
+    const [created] = await tx
+      .insert(votes)
+      .values({ studentId: null, grade, firstClass, secondClass })
+      .returning({ id: votes.id });
+    await tx.insert(auditLogs).values({
+      operatorName,
+      action: "vote.create_manual",
+      targetType: "vote",
+      targetId: String(created.id),
+      details: { grade, reason },
+    });
+  });
+}
+
+export async function getManualVotes() {
+  return db
+    .select({
+      id: votes.id,
+      grade: votes.grade,
+      invalid: votes.invalid,
+      votedAt: votes.votedAt,
+    })
+    .from(votes)
+    .where(isNull(votes.studentId))
+    .orderBy(desc(votes.votedAt), desc(votes.id));
 }

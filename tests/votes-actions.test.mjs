@@ -4,6 +4,7 @@ import { test } from "node:test";
 import vm from "node:vm";
 import ts from "typescript";
 import { PERMISSION } from "../src/db/schema.ts";
+import { getAuditReason } from "../src/lib/audit-reason.ts";
 
 function load(path, modules) {
   const code = ts.transpileModule(
@@ -31,6 +32,7 @@ const { changeVoteAction } = load(
       },
     },
     "@/lib/permission": permission,
+    "@/lib/audit-reason": { getAuditReason },
     "@/lib/session": { getCurrentUser: async () => user },
   },
 );
@@ -40,6 +42,7 @@ function submit(values) {
     studentId: "3A1",
     voteId: "7",
     operation: "invalidate",
+    reason: "確認のため",
     ...values,
   }))
     form.set(key, value);
@@ -55,8 +58,10 @@ test("vote mutations require operator permission and validate the target", async
     { voteId: "-1" },
     { voteId: "1.5" },
     { voteId: "2147483648" },
-    { studentId: "" },
+    { studentId: "   " },
     { operation: "restore" },
+    { reason: "   " },
+    { reason: "a".repeat(501) },
   ]) {
     assert.equal((await submit(values)).success, false);
   }
@@ -65,7 +70,18 @@ test("vote mutations require operator permission and validate the target", async
   assert.match((await submit()).error, /見つからない/);
   found = true;
   assert.equal((await submit()).success, true);
-  assert.deepEqual(calls.at(-1), ["3A1", 7, "invalidate", "operator"]);
+  assert.deepEqual(calls.at(-1), [
+    "3A1",
+    7,
+    "invalidate",
+    "operator",
+    "確認のため",
+  ]);
   assert.equal((await submit({ operation: "delete" })).success, true);
   assert.equal(calls.at(-1)[2], "delete");
+  assert.equal(
+    (await submit({ studentId: "", operation: "delete" })).success,
+    true,
+  );
+  assert.deepEqual(calls.at(-1), [null, 7, "delete", "operator", "確認のため"]);
 });

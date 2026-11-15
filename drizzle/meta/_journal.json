@@ -36,6 +36,13 @@
       "when": 1794724257767,
       "tag": "0004_sync_student_part",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1794733717130,
+      "tag": "0005_allow_manual_votes",
+      "breakpoints": true
     }
   ]
 }

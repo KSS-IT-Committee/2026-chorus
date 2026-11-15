@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useEffect, useRef, useState } from "react";
+import { AuditReasonField } from "@/components/AuditReasonField";
 import { createMemberAction } from "@/app/dashboard/members/actions";
 import styles from "./CreateMemberButton.module.css";
 
@@ -43,6 +44,7 @@ function CreateMemberForm({ close }: { close: () => void }) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [permission, setPermission] = useState("member");
+  const [reason, setReason] = useState("");
   const [state, action, pending] = useActionState(createMemberAction, {
     error: null,
     success: false,
@@ -105,6 +107,11 @@ function CreateMemberForm({ close }: { close: () => void }) {
         <option value="operator">operator</option>
         <option value="admin">admin</option>
       </select>
+      <AuditReasonField
+        value={reason}
+        onChange={setReason}
+        disabled={pending}
+      />
       {state.error && (
         <p className={styles.error} role="alert">
           {state.error}

@@ -16,6 +16,13 @@ const modules = {
   },
   "@/app/dashboard/students/AutoRefresh": { AutoRefresh: () => null },
   "@/components/Authguard": { AuthGuard: () => null },
+  "@/components/AddManualVoteButton": {
+    AddManualVoteButton: () => jsx.jsx("button", { children: "投票を追加" }),
+  },
+  "@/lib/permission": {
+    hasMinimumPermission: (user) =>
+      ["admin", "operator"].includes(user.permission),
+  },
   "@/db/votes": {
     getVoteTotals: async () => {
       reads++;
@@ -65,7 +72,12 @@ test("results show every class, use zero for missing counts, and require a signe
   assert.equal((html.match(/第一希望/g) ?? []).length, 12);
   assert.equal((html.match(/第二希望/g) ?? []).length, 12);
   assert.match(html, /3<\/span>/);
+  assert.doesNotMatch(html, /投票を追加/);
+  user = { permission: "operator" };
+  const operatorHtml = renderToStaticMarkup(await content.type(content.props));
+  assert.match(operatorHtml, /投票を追加/);
+  assert.match(operatorHtml, /手動投票の一覧/);
   user = null;
   assert.equal(await content.type(content.props), null);
-  assert.equal(reads, 1);
+  assert.equal(reads, 2);
 });

@@ -3,13 +3,17 @@ import "server-only";
 import { eq } from "drizzle-orm";
 import { members, PERMISSION, sessions } from "@/db/schema";
 import { isValidNewPassword } from "@/lib/account-validation";
-import { db } from "@/lib/db";
+import { db, type Executor } from "@/lib/db";
 import { hashPassword } from "@/lib/password";
 
-export async function resetMemberPassword(username: string, password: string) {
+export async function resetMemberPassword(
+  username: string,
+  password: string,
+  executor: Executor = db,
+) {
   if (!isValidNewPassword(password)) throw new Error("Invalid password");
   const hash = await hashPassword(password);
-  return db.transaction(async (tx) => {
+  return executor.transaction(async (tx) => {
     const updated = await tx
       .update(members)
       .set({ password: hash, hasLoggedIn: false })
@@ -24,9 +28,10 @@ export async function resetMemberPassword(username: string, password: string) {
 export async function updateMemberPermission(
   username: string,
   permission: (typeof PERMISSION)[number],
+  executor: Executor = db,
 ) {
   if (!PERMISSION.includes(permission)) throw new Error("Invalid permission");
-  const updated = await db
+  const updated = await executor
     .update(members)
     .set({ permission })
     .where(eq(members.username, username))

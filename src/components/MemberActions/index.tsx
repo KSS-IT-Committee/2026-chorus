@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { AuditReasonField } from "@/components/AuditReasonField";
 import type { PERMISSION } from "@/db/schema";
 import { updateMemberAction } from "@/app/dashboard/members/[username]/actions";
 import styles from "./MemberActions.module.css";
@@ -93,6 +94,7 @@ function MemberActionForm({
   const [password, setPassword] = useState("");
   const [confirmation, setConfirmation] = useState("");
   const [selected, setSelected] = useState(permission);
+  const [reason, setReason] = useState("");
   const titles = {
     password: "パスワードをリセット",
     permission: "権限を変更",
@@ -180,6 +182,11 @@ function MemberActionForm({
           このアカウントを削除します。元に戻すことはできません。
         </p>
       )}
+      <AuditReasonField
+        value={reason}
+        onChange={setReason}
+        disabled={pending}
+      />
       {state.error && (
         <p className={dialogStyles.error} role="alert">
           {state.error}
