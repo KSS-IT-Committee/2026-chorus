@@ -48,7 +48,7 @@ async function VoteStudentContent({
 
   return (
     <>
-      <AutoRefresh />
+      <AutoRefresh intervalMs={3_000} />
       <Link href={backHref} className={rosterStyles.back}>
         ←{" "}
         {className ? `${grade}年のクラス一覧` : grade ? "学年一覧" : "投票結果"}
@@ -62,35 +62,33 @@ async function VoteStudentContent({
               ? `${grade}年`
               : "学年を選択"}
         </h2>
-        {grade && !className && (
-          <p className={rosterStyles.voteNote}>
-            3学年分の投票がある生徒を数えます。無効票も含みます。
-          </p>
-        )}
         {className ? (
           roster.length ? (
-            <ul className={styles.pageList}>
-              {roster.map((student) => (
-                <li key={student.id} className={styles.pageListItem}>
-                  <Link
-                    href={`/dashboard/votes/students/${encodeURIComponent(student.id)}`}
-                    className={styles.pageLink}
-                  >
-                    <span className={styles.username}>
-                      {student.attendanceNumber}番　{student.id}
-                    </span>
-                    <span className={rosterStyles.listStatus}>
-                      {student.voteCount === 0
-                        ? "未投票"
-                        : student.voteCount === 3
-                          ? "投票済み"
-                          : `${student.voteCount}/3件投票済み`}{" "}
-                      {student.invalidCount > 0 && "（無効票あり）"}
-                    </span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
+            <>
+              <p>{roster.length}人</p>
+              <ul className={styles.pageList}>
+                {roster.map((student) => (
+                  <li key={student.id} className={styles.pageListItem}>
+                    <Link
+                      href={`/dashboard/votes/students/${encodeURIComponent(student.id)}`}
+                      className={styles.pageLink}
+                    >
+                      <span className={styles.username}>
+                        {student.attendanceNumber}番　{student.id}
+                      </span>
+                      <span className={rosterStyles.listStatus}>
+                        {student.voteCount === 0
+                          ? "未投票"
+                          : student.voteCount === 3
+                            ? "投票済み"
+                            : `${student.voteCount}/3件投票済み`}{" "}
+                        {student.invalidCount > 0 && "（無効票あり）"}
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </>
           ) : (
             <p className={styles.empty}>生徒は登録されていません。</p>
           )
@@ -99,8 +97,8 @@ async function VoteStudentContent({
             {(grade ? CLASS_LETTERS : GRADES).map((value) => {
               const members = grade
                 ? roster.filter(
-                    (student) => student.className === `${grade}${value}`,
-                  )
+                  (student) => student.className === `${grade}${value}`,
+                )
                 : [];
               return (
                 <li key={value} className={styles.pageListItem}>

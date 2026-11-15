@@ -36,7 +36,7 @@ async function StudentVotesContent({ params }: { params: Params }) {
   const backHref = `/dashboard/votes/students?grade=${student.className.slice(0, 1)}&class=${student.className.slice(1)}`;
   return (
     <>
-      <AutoRefresh />
+      <AutoRefresh intervalMs={3_000} />
       <Link href={backHref} className={rosterStyles.back}>
         ← {student.className}組の生徒一覧
       </Link>
