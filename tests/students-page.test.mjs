@@ -8,30 +8,27 @@ import * as jsx from "react/jsx-runtime";
 const queries = [];
 const modules = {
   "react/jsx-runtime": jsx,
-  "drizzle-orm": { eq: (_column, value) => value },
   "next/link": { default: () => null },
   "@/components/Authguard": { AuthGuard: () => null },
-  "@/db/schema": {
-    students: { classname: "classname", attendanceNumber: "number" },
-  },
+  "@/components/CreateStudentButton": { CreateStudentButton: () => null },
+  "@/components/StudentActions": { StudentActions: () => null },
   "@/lib/class-name": {
     GRADES: [1, 2, 3],
     CLASS_LETTERS: ["A", "B", "C", "D"],
     toClassName: (grade, letter) =>
       /^[A-D]$/.test(letter) ? `${grade}${letter}` : null,
   },
-  "@/lib/db": {
-    db: {
-      select: () => ({
-        from: () => ({
-          where: (value) => ({
-            orderBy: async () => {
-              queries.push(value);
-              return [];
-            },
-          }),
-        }),
-      }),
+  "@/db/students": {
+    getStudentCounts: async () => [
+      { className: "1A", count: 1 },
+      { className: "1B", count: 2 },
+      { className: "1C", count: 3 },
+      { className: "1D", count: 4 },
+      { className: "2A", count: 3 },
+    ],
+    getStudents: async (className) => {
+      queries.push(className);
+      return [];
     },
   },
   "../members/page.module.css": { default: {} },
@@ -69,12 +66,37 @@ test("students are queried only after a valid grade and class are selected", asy
     { grade: "2", class: "X" },
   ]) {
     const tree = await content(params);
-    const section = tree.props.children[1];
+    const section = tree.props.children[2];
     assert.equal(section.props.children[2].type, "ul");
   }
   assert.equal(queries.length, 0);
   const tree = await content({ grade: "2", class: "A" });
-  const list = tree.props.children[1].props.children[2].props.children[1];
+  const button = tree.props.children[2].props.children[1].props.children[1];
+  assert.equal(button.props.grade, "2");
+  assert.equal(button.props.class, "A");
+  const list = tree.props.children[2].props.children[2];
   await list.type(list.props);
   assert.deepEqual(queries, ["2A"]);
+});
+
+test("selection lists show missing classes and registered student counts", async () => {
+  const grades = (await content({})).props.children[2].props.children[2].props
+    .children;
+  assert.equal(grades[0].props.children.props.children[1], null);
+  assert.equal(
+    grades[1].props.children.props.children[1].props.children,
+    "未登録のクラスあり",
+  );
+  assert.equal(
+    grades[2].props.children.props.children[1].props.children,
+    "未登録のクラスあり",
+  );
+  const classes = (await content({ grade: "2" })).props.children[2].props
+    .children[2].props.children;
+  const first = classes[0].props.children.props.children[1].props.children;
+  const second = classes[1].props.children.props.children[1].props.children;
+  assert.equal(first[0], 3);
+  assert.equal(first[2], false);
+  assert.equal(second[0], 0);
+  assert.equal(second[2], "（未登録）");
 });

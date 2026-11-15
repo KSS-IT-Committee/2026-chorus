@@ -2,6 +2,7 @@ import { forbidden, unauthorized } from "next/navigation";
 
 import { PERMISSION } from "@/db/schema";
 import { getCurrentUser } from "@/lib/session";
+import { hasMinimumPermission } from "@/lib/permission";
 
 export async function AuthGuard({
   children,
@@ -15,10 +16,11 @@ export async function AuthGuard({
     unauthorized();
   }
 
-  if (minimumPermission !== undefined) {
-    const required = PERMISSION.indexOf(minimumPermission);
-    const actual = PERMISSION.indexOf(user.permission);
-    if (required < 0 || actual < 0 || actual > required) forbidden();
+  if (
+    minimumPermission !== undefined &&
+    !hasMinimumPermission(user, minimumPermission)
+  ) {
+    forbidden();
   }
 
   return <>{children}</>;

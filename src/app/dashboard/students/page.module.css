@@ -44,3 +44,31 @@
     padding: 12px 6px;
   }
 }
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.table .actionHeader,
+.table .actionCell {
+  width: 56px;
+  padding: 4px 6px;
+}
+
+.actionHeader span {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.listStatus {
+  color: var(--theme-muted);
+  font-size: 0.875rem;
+  text-align: right;
+}

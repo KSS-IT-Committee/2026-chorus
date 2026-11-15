@@ -1,13 +1,13 @@
-import { eq } from "drizzle-orm";
 import Link from "next/link";
 
 import { AuthGuard } from "@/components/Authguard";
-import { students } from "@/db/schema";
+import { getStudentCounts, getStudents } from "@/db/students";
 import { CLASS_LETTERS, GRADES, toClassName } from "@/lib/class-name";
-import { db } from "@/lib/db";
 import styles from "../members/page.module.css";
 import rosterStyles from "./page.module.css";
 import { AutoRefresh } from "./AutoRefresh";
+import { CreateStudentButton } from "@/components/CreateStudentButton";
+import { StudentActions } from "@/components/StudentActions";
 
 export const instant = false;
 
@@ -38,9 +38,10 @@ async function StudentsContent({
     grade && typeof params.class === "string"
       ? toClassName(grade, params.class)
       : null;
-
+  const counts = className ? [] : await getStudentCounts();
   return (
     <>
+      <AutoRefresh />
       <h1 className={styles.title}>生徒名簿</h1>
       <section className={rosterStyles.content}>
         {grade && (
@@ -55,36 +56,65 @@ async function StudentsContent({
             ← {className ? `${grade}年のクラス一覧` : "学年一覧"}
           </Link>
         )}
-        <h2 className={styles.subtitle}>
-          {className
-            ? `${grade}年${className.slice(1)}組`
-            : grade
-              ? `${grade}年`
-              : "学年を選択"}
-        </h2>
+        <div className={rosterStyles.header}>
+          <h2 className={styles.subtitle}>
+            {className
+              ? `${grade}年${className.slice(1)}組`
+              : grade
+                ? `${grade}年`
+                : "学年を選択"}
+          </h2>
+          {className && (
+            <CreateStudentButton
+              grade={className.slice(0, 1)}
+              class={className.slice(1)}
+            />
+          )}
+        </div>
         {className ? (
-          <>
-            <AutoRefresh />
-            <StudentList className={className} />
-          </>
+          <StudentList className={className} />
         ) : (
           <ul className={styles.pageList}>
-            {(grade ? CLASS_LETTERS : GRADES).map((value) => (
-              <li key={value} className={styles.pageListItem}>
-                <Link
-                  href={
-                    grade
-                      ? `/dashboard/students?grade=${grade}&class=${value}`
-                      : `/dashboard/students?grade=${value}`
-                  }
-                  className={styles.pageLink}
-                >
-                  <span className={styles.username}>
-                    {grade ? `${value}組` : `${value}年`}
-                  </span>
-                </Link>
-              </li>
-            ))}
+            {(grade ? CLASS_LETTERS : GRADES).map((value) => {
+              const count = grade
+                ? (counts.find((row) => row.className === `${grade}${value}`)
+                    ?.count ?? 0)
+                : 0;
+              const hasEmptyClass =
+                !grade &&
+                CLASS_LETTERS.some(
+                  (letter) =>
+                    !counts.some(
+                      (row) =>
+                        row.className === `${value}${letter}` && row.count > 0,
+                    ),
+                );
+              return (
+                <li key={value} className={styles.pageListItem}>
+                  <Link
+                    href={
+                      grade
+                        ? `/dashboard/students?grade=${grade}&class=${value}`
+                        : `/dashboard/students?grade=${value}`
+                    }
+                    className={styles.pageLink}
+                  >
+                    <span className={styles.username}>
+                      {grade ? `${value}組` : `${value}年`}
+                    </span>
+                    {grade ? (
+                      <span className={rosterStyles.listStatus}>
+                        {count}人{count === 0 && "（未登録）"}
+                      </span>
+                    ) : hasEmptyClass ? (
+                      <span className={rosterStyles.listStatus}>
+                        未登録のクラスあり
+                      </span>
+                    ) : null}
+                  </Link>
+                </li>
+              );
+            })}
           </ul>
         )}
       </section>
@@ -97,11 +127,7 @@ async function StudentList({
 }: {
   className: NonNullable<ReturnType<typeof toClassName>>;
 }) {
-  const roster = await db
-    .select()
-    .from(students)
-    .where(eq(students.classname, className))
-    .orderBy(students.attendanceNumber);
+  const roster = await getStudents(className);
 
   if (!roster.length)
     return <p className={styles.empty}>生徒は登録されていません。</p>;
@@ -113,6 +139,9 @@ async function StudentList({
           <th scope="col">出席番号</th>
           <th scope="col">生徒番号</th>
           <th scope="col">パート</th>
+          <th scope="col" className={rosterStyles.actionHeader}>
+            <span>操作</span>
+          </th>
         </tr>
       </thead>
       <tbody>
@@ -121,6 +150,9 @@ async function StudentList({
             <td>{student.attendanceNumber}</td>
             <td>{student.id}</td>
             <td>{student.part}</td>
+            <td className={rosterStyles.actionCell}>
+              <StudentActions id={student.id} part={student.part} />
+            </td>
           </tr>
         ))}
       </tbody>
