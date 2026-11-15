@@ -144,13 +144,9 @@
         "sessions_username_members_username_fk": {
           "name": "sessions_username_members_username_fk",
           "tableFrom": "sessions",
-          "columnsFrom": [
-            "username"
-          ],
+          "columnsFrom": ["username"],
           "tableTo": "members",
-          "columnsTo": [
-            "username"
-          ],
+          "columnsTo": ["username"],
           "onUpdate": "no action",
           "onDelete": "cascade"
         }
@@ -254,11 +250,7 @@
       "uniqueConstraints": {
         "students_grade_class_number_unique": {
           "name": "students_grade_class_number_unique",
-          "columns": [
-            "grade",
-            "class",
-            "attendance_number"
-          ],
+          "columns": ["grade", "class", "attendance_number"],
           "nullsNotDistinct": false
         }
       },
@@ -339,13 +331,9 @@
         "votes_student_id_students_id_fk": {
           "name": "votes_student_id_students_id_fk",
           "tableFrom": "votes",
-          "columnsFrom": [
-            "student_id"
-          ],
+          "columnsFrom": ["student_id"],
           "tableTo": "students",
-          "columnsTo": [
-            "id"
-          ],
+          "columnsTo": ["id"],
           "onUpdate": "no action",
           "onDelete": "no action"
         }
@@ -354,10 +342,7 @@
       "uniqueConstraints": {
         "votes_student_grade_unique": {
           "name": "votes_student_grade_unique",
-          "columns": [
-            "student_id",
-            "grade"
-          ],
+          "columns": ["student_id", "grade"],
           "nullsNotDistinct": false
         }
       },
@@ -401,22 +386,12 @@
     "public.part": {
       "name": "part",
       "schema": "public",
-      "values": [
-        "Soprano",
-        "Alto",
-        "Tenor",
-        "Bass"
-      ]
+      "values": ["Soprano", "Alto", "Tenor", "Bass"]
     },
     "public.permission": {
       "name": "permission",
       "schema": "public",
-      "values": [
-        "admin",
-        "operator",
-        "editor",
-        "member"
-      ]
+      "values": ["admin", "operator", "editor", "member"]
     }
   },
   "schemas": {},

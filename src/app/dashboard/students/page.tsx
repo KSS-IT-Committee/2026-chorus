@@ -57,7 +57,12 @@ async function StudentsContent({
               : "/dashboard"
         }
       >
-        ← {className ? `${grade}年のクラス一覧` : grade ? "学年一覧" : "合唱委員ページ"}
+        ←{" "}
+        {className
+          ? `${grade}年のクラス一覧`
+          : grade
+            ? "学年一覧"
+            : "合唱委員ページ"}
       </Link>
       <div className={rosterStyles.pageHeader}>
         <h1 className={styles.title}>生徒名簿</h1>
@@ -88,7 +93,7 @@ async function StudentsContent({
             {(grade ? CLASS_LETTERS : GRADES).map((value) => {
               const count = grade
                 ? (counts.find((row) => row.className === `${grade}${value}`)
-                  ?.count ?? 0)
+                    ?.count ?? 0)
                 : 0;
               const hasEmptyClass =
                 !grade &&

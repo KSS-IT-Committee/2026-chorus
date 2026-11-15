@@ -75,7 +75,8 @@ async function VoteStudentContent({
                       className={styles.pageLink}
                     >
                       <span className={styles.username}>
-                        {student.attendanceNumber}番　{formatStudentId(student.id)}
+                        {student.attendanceNumber}番　
+                        {formatStudentId(student.id)}
                       </span>
                       <span className={rosterStyles.listStatus}>
                         {student.voteCount === 0
@@ -98,8 +99,8 @@ async function VoteStudentContent({
             {(grade ? CLASS_LETTERS : GRADES).map((value) => {
               const members = grade
                 ? roster.filter(
-                  (student) => student.className === `${grade}${value}`,
-                )
+                    (student) => student.className === `${grade}${value}`,
+                  )
                 : [];
               return (
                 <li key={value} className={styles.pageListItem}>

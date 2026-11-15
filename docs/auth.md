@@ -3,10 +3,10 @@
 データベースのマイグレーションを適用してから、対話可能な端末で次のコマンドを実行し、表示されるプロンプトにパスワードを入力します。ユーザー名と新しいパスワードには、空白を除く半角英数字と記号を使用してください。ユーザー名は1〜32文字、パスワードは8〜1024文字です。
 
 ```sh
-DATABASE_URL='postgresql://...' node scripts/create-member.mjs USERNAME
+DATABASE_URL='postgresql://...' node scripts/create-member.mjs USERNAME admin
 ```
 
-既存のユーザー名は上書きされません。パスワードは scrypt でハッシュ化され、ログインに成功すると2日間有効なセッションを作成します。`getCurrentUser()` は有効なセッションの `{ username, permission }` を返し、未ログインの場合は `null` を返します。保護するページ、Server Action、Route Handler はそれぞれ認証を確認してください。
+初期管理者を作るときは、上の例のように `admin` を指定します。権限を省略すると `member` になります。ユーザー名に `.` と `..` は使えません。既存のユーザー名は上書きされません。パスワードは scrypt でハッシュ化され、ログインに成功すると2日間有効なセッションを作成します。`getCurrentUser()` は有効なセッションの `{ username, permission }` を返し、未ログインの場合は `null` を返します。保護するページ、Server Action、Route Handler はそれぞれ認証を確認してください。
 
 `Internal` は `minimumPermission` に指定した権限以上のメンバーに子要素を表示します。権限は高い順に `admin`、`operator`、`editor`、`member` です。表示の制限とは別に、データの取得や変更を行う処理でも権限を確認してください。
 

@@ -13,7 +13,7 @@ export async function addMembers(
 ) {
   if (!isValidUsername(username)) {
     throw new Error(
-      "Username must be 1 to 32 printable ASCII characters without spaces",
+      "Username must be 1 to 32 printable ASCII characters without spaces and cannot be . or ..",
     );
   }
   if (!isValidNewPassword(password)) {

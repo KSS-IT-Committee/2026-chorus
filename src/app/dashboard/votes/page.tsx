@@ -3,6 +3,8 @@ import navigationStyles from "../students/page.module.css";
 import { AuthGuard } from "@/components/Authguard";
 import Link from "next/link";
 
+export const instant = false;
+
 const pageList = [
   { href: "students", title: "生徒ごとの投票" },
   { href: "result", title: "投票結果" },

@@ -16,7 +16,9 @@ export default async function ChangePasswordPage() {
       </Link>
       <section className={styles.panel}>
         <h1>パスワード変更</h1>
-        <p>パスワードを忘れてしまった場合、admin権限を持つメンバーにリセットを依頼してください。</p>
+        <p>
+          パスワードを忘れてしまった場合、admin権限を持つメンバーにリセットを依頼してください。
+        </p>
         <ChangePasswordForm />
       </section>
     </main>

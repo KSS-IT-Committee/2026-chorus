@@ -28,7 +28,7 @@ export async function createMemberAction(
   if (!isValidUsername(username)) {
     return {
       error:
-        "ユーザー名は半角英数字と記号で1文字以上32文字以下にしてください。",
+        "ユーザー名は半角英数字と記号で1〜32文字にしてください。「.」と「..」は使えません。",
       success: false,
     };
   }
@@ -46,15 +46,13 @@ export async function createMemberAction(
   try {
     await db.transaction(async (tx) => {
       await addMembers(username, password, permission, tx);
-      await tx
-        .insert(auditLogs)
-        .values({
-          operatorName: user.username,
-          action: "member.create",
-          targetType: "member",
-          targetId: username,
-          details: { reason, permission },
-        });
+      await tx.insert(auditLogs).values({
+        operatorName: user.username,
+        action: "member.create",
+        targetType: "member",
+        targetId: username,
+        details: { reason, permission },
+      });
     });
   } catch (error) {
     const cause = error instanceof Error ? error.cause : null;

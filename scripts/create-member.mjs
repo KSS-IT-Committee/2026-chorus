@@ -1,15 +1,22 @@
 import { stdin, stdout } from "node:process";
 import postgres from "postgres";
+import { PERMISSION } from "../src/db/schema.ts";
 import { hashPassword } from "../src/lib/password.ts";
 import {
   isValidNewPassword,
   isValidUsername,
 } from "../src/lib/account-validation.ts";
 
-const username = process.argv[2];
-if (!isValidUsername(username) || !process.env.DATABASE_URL || !stdin.isTTY) {
+const [, , username, permission = "member"] = process.argv;
+if (
+  !isValidUsername(username) ||
+  !PERMISSION.includes(permission) ||
+  process.argv.length > 4 ||
+  !process.env.DATABASE_URL ||
+  !stdin.isTTY
+) {
   console.error(
-    "Usage: DATABASE_URL=... node scripts/create-member.mjs <username> (interactive terminal required)",
+    "Usage: DATABASE_URL=... node scripts/create-member.mjs <username> [admin|operator|editor|member] (interactive terminal required)",
   );
   process.exit(1);
 }
@@ -38,7 +45,7 @@ if (!isValidNewPassword(password))
 const sql = postgres(process.env.DATABASE_URL, { max: 1 });
 try {
   const hash = await hashPassword(password);
-  await sql`insert into members (username, password_hash) values (${username}, ${hash})`;
+  await sql`insert into members (username, password_hash, permission) values (${username}, ${hash}, ${permission})`;
   console.log("Member created.");
 } finally {
   await sql.end();

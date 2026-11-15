@@ -47,19 +47,28 @@ export async function loginAction(
     count: (attempt?.count ?? 0) + 1,
     until: attempt?.until ?? now + 60_000,
   });
-  const [member] = await db
-    .select()
-    .from(members)
-    .where(eq(members.username, username));
-  const valid = await verifyPassword(password, member?.password ?? DUMMY_HASH);
-  if (!member || !valid)
+  const token = await db.transaction(async (tx) => {
+    const [member] = await tx
+      .select()
+      .from(members)
+      .where(eq(members.username, username))
+      .for("update");
+    const valid = await verifyPassword(
+      password,
+      member?.password ?? DUMMY_HASH,
+    );
+    if (!member || !valid) return null;
+
+    const token = await createSession(member.username, tx);
+    await tx
+      .update(members)
+      .set({ hasLoggedIn: true })
+      .where(eq(members.username, member.username));
+    return token;
+  });
+  if (!token)
     return { error: "ユーザー名またはパスワードが正しくありません。" };
   attempts.delete(username);
-  const token = await createSession(member.username);
-  await db
-    .update(members)
-    .set({ hasLoggedIn: true })
-    .where(eq(members.username, member.username));
   (await cookies()).set(SESSION_COOKIE_NAME, token, sessionCookieOptions);
   redirect("/dashboard");
 }

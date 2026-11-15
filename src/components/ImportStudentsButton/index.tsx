@@ -91,7 +91,8 @@ function ImportForm({ close }: { close: () => void }) {
         <>
           <p className={styles.hint}>
             UTF-8形式。学年、クラス、出席番号、パートを入力してください。出席番号は1〜40、パートは
-            Soprano・Alto・Tenor・Bass のいずれかです。クラスは大文字で入力してください。
+            Soprano・Alto・Tenor・Bass
+            のいずれかです。クラスは大文字で入力してください。
           </p>
           <a
             href="data:text/csv;charset=utf-8,grade%2Cclass%2CattendanceNumber%2Cpart%0A"

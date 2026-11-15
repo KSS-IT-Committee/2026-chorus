@@ -21,9 +21,18 @@ test("validates password changes at the server boundary", () => {
 
 test("accepts only non-space printable ASCII for new credentials", () => {
   for (let code = 33; code <= 126; code++) {
-    assert.ok(isValidUsername(String.fromCharCode(code)));
+    const character = String.fromCharCode(code);
+    assert.ok(isValidUsername(character.repeat(3)));
   }
-  for (const value of ["", "日本語", "abc def", "abc\n", "a".repeat(33)])
+  for (const value of [
+    "",
+    ".",
+    "..",
+    "日本語",
+    "abc def",
+    "abc\n",
+    "a".repeat(33),
+  ])
     assert.equal(isValidUsername(value), false);
   assert.ok(isValidNewPassword("abcXYZ09!@#$%^&*()_+-=[]{};:'\",.<>/?\\|`~"));
   for (const value of [

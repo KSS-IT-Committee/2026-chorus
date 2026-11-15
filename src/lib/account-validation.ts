@@ -3,6 +3,8 @@ export function isValidUsername(value: unknown): value is string {
     typeof value === "string" &&
     value.length > 0 &&
     value.length <= 32 &&
+    value !== "." &&
+    value !== ".." &&
     !/[^!-~]/.test(value)
   );
 }

@@ -30,12 +30,11 @@ async function MembersContent() {
       </Link>
       <h1 className={styles.title}>委員アカウント管理</h1>
 
-
       <div className={styles.content}>
         <section className={styles.membersListContainer}>
           <div className={styles.titleContainer}>
             <h2 className={styles.subtitle}>委員アカウント一覧</h2>
-            
+
             <Internal minimumPermission="admin">
               <CreateMemberButton />
             </Internal>
@@ -62,7 +61,7 @@ async function MembersContent() {
           ) : (
             <p className={styles.empty}>委員アカウントはありません。</p>
           )}
-        </section >
+        </section>
         <aside className={styles.roles}>
           <h2 className={styles.subtitle}>権限について</h2>
           <dl className={styles.roleList}>
@@ -89,7 +88,7 @@ async function MembersContent() {
             権限の変更とアカウントの作成・削除は、管理者のみが行えます。
           </p>
         </aside>
-      </div >
+      </div>
     </>
   );
 }
