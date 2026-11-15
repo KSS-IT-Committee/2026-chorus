@@ -8,6 +8,7 @@ import { getStudentVotes } from "@/db/votes";
 import { GRADES } from "@/lib/class-name";
 import { hasMinimumPermission } from "@/lib/permission";
 import { getCurrentUser } from "@/lib/session";
+import { formatStudentId } from "@/lib/student-id";
 import styles from "../../../members/page.module.css";
 import rosterStyles from "../../../students/page.module.css";
 
@@ -40,7 +41,7 @@ async function StudentVotesContent({ params }: { params: Params }) {
       <Link href={backHref} className={rosterStyles.back}>
         ← {student.className}組の生徒一覧
       </Link>
-      <h1 className={styles.title}>{student.id}</h1>
+      <h1 className={styles.title}>{formatStudentId(student.id)}</h1>
       <section className={rosterStyles.content}>
         <h2 className={styles.subtitle}>投票状況</h2>
         <ul className={styles.pageList}>

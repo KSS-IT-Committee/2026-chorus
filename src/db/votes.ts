@@ -76,3 +76,19 @@ export async function changeVote(
     return true;
   });
 }
+
+export async function getVoteTotals() {
+  return db.execute<{
+    className: ClassName;
+    firstCount: number;
+    secondCount: number;
+  }>(sql`
+    select selection.class_name as "className",
+      count(*) filter (where selection.choice = 1)::int as "firstCount",
+      count(*) filter (where selection.choice = 2)::int as "secondCount"
+    from ${votes}
+    cross join lateral unnest(array[${votes.firstClass}, ${votes.secondClass}]) with ordinality as selection(class_name, choice)
+    where ${votes.invalid} = false
+    group by selection.class_name
+  `);
+}

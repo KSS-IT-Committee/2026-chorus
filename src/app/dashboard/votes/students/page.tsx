@@ -5,6 +5,7 @@ import { AutoRefresh } from "@/app/dashboard/students/AutoRefresh";
 import { getVoteStudentSummaries } from "@/db/votes";
 import { CLASS_LETTERS, GRADES, toClassName } from "@/lib/class-name";
 import { getCurrentUser } from "@/lib/session";
+import { formatStudentId } from "@/lib/student-id";
 import styles from "../../members/page.module.css";
 import rosterStyles from "../../students/page.module.css";
 
@@ -74,7 +75,7 @@ async function VoteStudentContent({
                       className={styles.pageLink}
                     >
                       <span className={styles.username}>
-                        {student.attendanceNumber}番　{student.id}
+                        {student.attendanceNumber}番　{formatStudentId(student.id)}
                       </span>
                       <span className={rosterStyles.listStatus}>
                         {student.voteCount === 0

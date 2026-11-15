@@ -4,12 +4,14 @@ import { test } from "node:test";
 import vm from "node:vm";
 import ts from "typescript";
 import * as jsx from "react/jsx-runtime";
+import { formatStudentId } from "../src/lib/student-id.ts";
 
 const queries = [];
 let permission = "editor";
 const modules = {
   "react/jsx-runtime": jsx,
   "next/link": { default: () => null },
+  "@/lib/student-id": { formatStudentId },
   "@/components/Authguard": { AuthGuard: () => null },
   "@/components/CreateStudentButton": { CreateStudentButton: () => null },
   "@/components/StudentActions": { StudentActions: () => null },

@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect, useRef, useState } from "react";
 import { PARTS } from "@/db/schema";
+import { formatStudentId } from "@/lib/student-id";
 import { updateStudentAction } from "@/app/dashboard/students/actions";
 import dialogStyles from "@/components/CreateStudentButton/CreateStudentButton.module.css";
 import styles from "./StudentActions.module.css";
@@ -17,7 +18,7 @@ export function StudentActions({ id, part }: Props) {
       <button
         type="button"
         className={styles.edit}
-        aria-label={`${id}を編集`}
+        aria-label={`${formatStudentId(id)}を編集`}
         onClick={() => {
           setIsOpen(true);
           dialog.current?.showModal();
@@ -41,7 +42,7 @@ export function StudentActions({ id, part }: Props) {
       <dialog
         ref={dialog}
         className={dialogStyles.dialog}
-        aria-label={`${id}の編集`}
+        aria-label={`${formatStudentId(id)}の編集`}
         onClose={() => setIsOpen(false)}
         onCancel={(event) => {
           if (dialog.current?.querySelector('button[type="submit"]:disabled'))
@@ -72,7 +73,7 @@ function StudentForm({ id, part, close }: Props & { close: () => void }) {
 
   return (
     <form action={action} className={dialogStyles.form}>
-      <h2>{id}</h2>
+      <h2>{formatStudentId(id)}</h2>
       <input type="hidden" name="id" value={id} />
       {confirmDelete ? (
         <p>この生徒を削除します。元に戻すことはできません。</p>

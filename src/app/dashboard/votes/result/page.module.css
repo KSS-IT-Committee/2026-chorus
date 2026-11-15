@@ -1,0 +1,77 @@
+.note {
+  margin-top: 14px;
+  color: var(--theme-muted);
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
+
+.results {
+  max-width: 960px;
+  display: grid;
+  gap: 40px;
+  margin-top: 44px;
+}
+
+.grade {
+  font-size: 1.125rem;
+  line-height: 1.5;
+}
+
+.classes {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px;
+  margin-top: 14px;
+  border-top: 2px solid var(--theme-progress);
+}
+
+.classResult {
+  min-width: 0;
+  padding: 16px 4px 18px;
+  border-bottom: 1px solid var(--theme-border);
+}
+
+.classResult dt {
+  font-weight: 700;
+}
+
+.choices {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+.label {
+  display: block;
+  color: var(--theme-muted);
+  font-size: 0.875rem;
+}
+
+.choices .unit {
+  margin-left: 4px;
+}
+
+.number {
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 700;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+.unit {
+  color: var(--theme-muted);
+}
+
+@media (max-width: 600px) {
+  .results {
+    gap: 32px;
+    margin-top: 32px;
+  }
+
+  .classes {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0 20px;
+  }
+}

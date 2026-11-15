@@ -10,6 +10,7 @@ import { CreateStudentButton } from "@/components/CreateStudentButton";
 import { StudentActions } from "@/components/StudentActions";
 import { ImportStudentsButton } from "@/components/ImportStudentsButton";
 import { getCurrentUser } from "@/lib/session";
+import { formatStudentId } from "@/lib/student-id";
 
 export const instant = false;
 
@@ -154,7 +155,7 @@ async function StudentList({
         {roster.map((student) => (
           <tr key={student.id}>
             <td>{student.attendanceNumber}</td>
-            <td>{student.id}</td>
+            <td>{formatStudentId(student.id)}</td>
             <td>{student.part}</td>
             <td className={rosterStyles.actionCell}>
               <StudentActions id={student.id} part={student.part} />

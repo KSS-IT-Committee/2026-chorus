@@ -4,6 +4,7 @@ import { test } from "node:test";
 import vm from "node:vm";
 import ts from "typescript";
 import * as jsx from "react/jsx-runtime";
+import { formatStudentId } from "../src/lib/student-id.ts";
 import { renderToStaticMarkup } from "react-dom/server";
 
 let user = { username: "test", permission: "operator" };
@@ -41,6 +42,7 @@ const modules = {
       throw new Error("not found");
     },
   },
+  "@/lib/student-id": { formatStudentId },
   "@/components/Authguard": { AuthGuard: () => null },
   "@/app/dashboard/students/AutoRefresh": { AutoRefresh: () => null },
   "@/components/VoteActions": {
@@ -106,6 +108,8 @@ test("class counts and student statuses distinguish partial and invalid votes", 
     searchParams: Promise.resolve({ grade: "1", class: "A" }),
   });
   assert.match(list, /無効票あり/);
+  assert.match(list, /1A01/);
+  assert.match(list, /href="\/dashboard\/votes\/students\/1A1"/);
   assert.match(list, /1\/3件/);
   assert.doesNotMatch(list, /1B1/);
 });
@@ -115,6 +119,7 @@ test("student details hide choices and restrict vote actions to operators", asyn
   const props = { params: Promise.resolve({ studentId: "1A1" }) };
   const admin = await renderPage(page, props);
   assert.match(admin, /無効票/);
+  assert.match(admin, /1A01/);
   assert.match(admin, /未投票/);
   assert.match(admin, /操作/);
   assert.doesNotMatch(admin, /第一希望|第二希望|firstClass|secondClass/);

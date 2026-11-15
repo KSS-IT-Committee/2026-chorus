@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState, useRef, useState } from "react";
+import { formatStudentId } from "@/lib/student-id";
 import {
   importStudentsAction,
   type ImportStudentsState,
@@ -73,7 +74,7 @@ function ImportForm({ close }: { close: () => void }) {
               <ul className={importStyles.updates}>
                 {state.updates.map((student) => (
                   <li key={student.id}>
-                    <span>{student.id}</span>
+                    <span>{formatStudentId(student.id)}</span>
                     <span>
                       {student.currentPart} → {student.part}
                     </span>
