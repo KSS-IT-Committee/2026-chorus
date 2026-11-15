@@ -1,4 +1,5 @@
 import styles from "./page.module.css";
+import navigationStyles from "../students/page.module.css";
 import { AuthGuard } from "@/components/Authguard";
 import { getCurrentUser } from "@/lib/session";
 import { getMembers } from "@/db/getMembers";
@@ -24,7 +25,9 @@ async function MembersContent() {
   if (!user) return null;
   return (
     <>
-
+      <Link href="/dashboard" className={navigationStyles.back}>
+        ← 合唱委員ページ
+      </Link>
       <h1 className={styles.title}>委員アカウント管理</h1>
 
 

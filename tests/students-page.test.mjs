@@ -13,6 +13,7 @@ const modules = {
   "next/link": { default: () => null },
   "@/lib/student-id": { formatStudentId },
   "@/components/Authguard": { AuthGuard: () => null },
+  "@/components/Internal": { Internal: () => null },
   "@/components/CreateStudentButton": { CreateStudentButton: () => null },
   "@/components/StudentActions": { StudentActions: () => null },
   "@/components/ImportStudentsButton": { ImportStudentsButton: () => null },
@@ -59,7 +60,7 @@ vm.runInNewContext(code, { exports, require: (id) => modules[id] });
 async function content(params) {
   const page = exports.default({ searchParams: Promise.resolve(params) });
   const guard = page.props.children;
-  assert.equal(guard.props.minimumPermission, "editor");
+  assert.equal(guard.props.minimumPermission, "member");
   return guard.props.children.type(guard.props.children.props);
 }
 
@@ -71,21 +72,22 @@ test("students are queried only after a valid grade and class are selected", asy
     { grade: "2", class: "X" },
   ]) {
     const tree = await content(params);
-    const section = tree.props.children[2];
-    assert.equal(section.props.children[2].type, "ul");
+    const section = tree.props.children[3];
+    assert.equal(section.props.children[1].type, "ul");
   }
   assert.equal(queries.length, 0);
   const tree = await content({ grade: "2", class: "A" });
-  const button = tree.props.children[2].props.children[1].props.children[1];
+  const button =
+    tree.props.children[3].props.children[0].props.children[1].props.children;
   assert.equal(button.props.grade, "2");
   assert.equal(button.props.class, "A");
-  const list = tree.props.children[2].props.children[2];
+  const list = tree.props.children[3].props.children[1];
   await list.type(list.props);
   assert.deepEqual(queries, ["2A"]);
 });
 
 test("selection lists show missing classes and registered student counts", async () => {
-  const grades = (await content({})).props.children[2].props.children[2].props
+  const grades = (await content({})).props.children[3].props.children[1].props
     .children;
   assert.equal(grades[0].props.children.props.children[1], null);
   assert.equal(
@@ -96,8 +98,8 @@ test("selection lists show missing classes and registered student counts", async
     grades[2].props.children.props.children[1].props.children,
     "未登録のクラスあり",
   );
-  const classes = (await content({ grade: "2" })).props.children[2].props
-    .children[2].props.children;
+  const classes = (await content({ grade: "2" })).props.children[3].props
+    .children[1].props.children;
   const first = classes[0].props.children.props.children[1].props.children;
   const second = classes[1].props.children.props.children[1].props.children;
   assert.equal(first[0], 3);
@@ -108,12 +110,24 @@ test("selection lists show missing classes and registered student counts", async
 
 test("CSV import control is shown only to admins", async () => {
   permission = "editor";
-  let header = (await content({})).props.children[1];
+  let header = (await content({})).props.children[2];
   assert.equal(header.props.children[1], false);
   permission = "admin";
-  header = (await content({})).props.children[1];
+  header = (await content({})).props.children[2];
   assert.equal(
     header.props.children[1].type,
     modules["@/components/ImportStudentsButton"].ImportStudentsButton,
+  );
+});
+
+test("student navigation returns to the parent of each selection", async () => {
+  assert.equal((await content({})).props.children[1].props.href, "/dashboard");
+  assert.equal(
+    (await content({ grade: "2" })).props.children[1].props.href,
+    "/dashboard/students",
+  );
+  assert.equal(
+    (await content({ grade: "2", class: "A" })).props.children[1].props.href,
+    "/dashboard/students?grade=2",
   );
 });

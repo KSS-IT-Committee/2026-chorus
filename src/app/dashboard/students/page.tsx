@@ -47,23 +47,23 @@ async function StudentsContent({
   return (
     <>
       <AutoRefresh />
+      <Link
+        className={rosterStyles.back}
+        href={
+          className
+            ? `/dashboard/students?grade=${grade}`
+            : grade
+              ? "/dashboard/students"
+              : "/dashboard"
+        }
+      >
+        ← {className ? `${grade}年のクラス一覧` : grade ? "学年一覧" : "合唱委員ページ"}
+      </Link>
       <div className={rosterStyles.pageHeader}>
         <h1 className={styles.title}>生徒名簿</h1>
         {user?.permission === "admin" && <ImportStudentsButton />}
       </div>
       <section className={rosterStyles.content}>
-        {grade && (
-          <Link
-            className={rosterStyles.back}
-            href={
-              className
-                ? `/dashboard/students?grade=${grade}`
-                : "/dashboard/students"
-            }
-          >
-            ← {className ? `${grade}年のクラス一覧` : "学年一覧"}
-          </Link>
-        )}
         <div className={rosterStyles.header}>
           <h2 className={styles.subtitle}>
             {className

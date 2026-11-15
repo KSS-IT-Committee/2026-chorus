@@ -1,4 +1,5 @@
 import styles from "./page.module.css";
+import navigationStyles from "../students/page.module.css";
 import { AuthGuard } from "@/components/Authguard";
 import Link from "next/link";
 
@@ -20,6 +21,9 @@ export default function VotesPage() {
 async function VotesContent() {
   return (
     <>
+      <Link href="/dashboard" className={navigationStyles.back}>
+        ← 合唱委員ページ
+      </Link>
       <h1 className={styles.title}>投票結果</h1>
       <nav className={styles.pageList} aria-label="ページ一覧">
         {pageList.map((page) => (

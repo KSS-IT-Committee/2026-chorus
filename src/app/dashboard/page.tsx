@@ -4,6 +4,7 @@ import { logoutAction } from "@/app/login/actions";
 import { AuthGuard } from "@/components/Authguard";
 import loginStyles from "@/app/login/page.module.css";
 import styles from "./page.module.css";
+import navigationStyles from "./students/page.module.css";
 
 export const instant = false;
 
@@ -31,6 +32,9 @@ async function DashboardContent() {
   if (!user) return null;
   return (
     <>
+      <Link href="/" className={navigationStyles.back}>
+        ← トップページ
+      </Link>
       <h1 className={styles.title}>合唱委員ページ</h1>
       <p>ログイン中：{user.username}</p>
 
