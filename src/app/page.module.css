@@ -1,6 +1,3 @@
-/* Colors fall back to the navy/yellow palette so the page also works before
-   the shared theme tokens (from the vote UI) land in globals.css. */
-
 .page {
   display: flex;
   flex: 1;

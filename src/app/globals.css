@@ -54,8 +54,20 @@
     --theme-warning: var(--YELLOW_B);
     --theme-button-text: var(--NAVY_C);
 
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #141a2b;
+    --foreground: #f4f1e5;
+    --theme-text: #f4f1e5;
+    --theme-muted: #d1d7e8;
+    --theme-progress: #e6c65d;
+    --theme-border: #a18b4a;
+    --theme-surface: #202942;
+    --theme-surface-soft: #29344f;
+    --theme-accent: #465381;
+    --theme-accent-hover: #536195;
+    --theme-button-text: #fff9df;
+    --theme-focus: #f3d879;
+    --theme-highlight: #495578;
+    --theme-highlight-text: #f4f1e5;
     color-scheme: dark;
   }
 }

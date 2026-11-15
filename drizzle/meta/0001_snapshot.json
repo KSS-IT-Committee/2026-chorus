@@ -1,5 +1,5 @@
 {
-  "id": "98f37d0d-860a-4b7c-9bd4-fccd35b293e3",
+  "id": "053080f1-cc12-45c8-b3eb-8369eac03ad6",
   "prevId": "fc3b4446-a3f5-4318-92cb-e52f70e35b33",
   "version": "7",
   "dialect": "postgresql",
@@ -82,6 +82,14 @@
           "primaryKey": false,
           "notNull": true,
           "default": false
+        },
+        "permission": {
+          "name": "permission",
+          "type": "permission",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'member'"
         }
       },
       "indexes": {},
@@ -303,12 +311,6 @@
           "primaryKey": false,
           "notNull": true
         },
-        "request_id": {
-          "name": "request_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": false
-        },
         "voted_at": {
           "name": "voted_at",
           "type": "timestamp with time zone",
@@ -317,23 +319,7 @@
           "default": "now()"
         }
       },
-      "indexes": {
-        "votes_request_id_unique": {
-          "name": "votes_request_id_unique",
-          "columns": [
-            {
-              "expression": "request_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": true,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
+      "indexes": {},
       "foreignKeys": {
         "votes_student_id_students_id_fk": {
           "name": "votes_student_id_students_id_fk",
@@ -394,6 +380,11 @@
       "name": "part",
       "schema": "public",
       "values": ["Soprano", "Alto", "Tenor", "Bass"]
+    },
+    "public.permission": {
+      "name": "permission",
+      "schema": "public",
+      "values": ["admin", "operator", "member"]
     }
   },
   "schemas": {},

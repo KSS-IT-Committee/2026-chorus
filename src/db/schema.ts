@@ -31,9 +31,12 @@ export const CLASSNAMES = [
   "3D",
 ] as const;
 
+export const PERMISSION = ["admin", "operator", "editor", "member"] as const;
+
 export const PARTS = ["Soprano", "Alto", "Tenor", "Bass"] as const;
 
 export const classEnum = pgEnum("class_name", CLASSNAMES);
+export const permissionEnum = pgEnum("permission", PERMISSION);
 
 export const partEnum = pgEnum("part", PARTS);
 
@@ -41,6 +44,7 @@ export const members = pgTable("members", {
   username: varchar("username", { length: 32 }).primaryKey(),
   password: varchar("password_hash", { length: 60 }).notNull(),
   hasLoggedIn: boolean("has_logged_in").notNull().default(false),
+  permission: permissionEnum("permission").notNull().default("member"),
 });
 
 export const sessions = pgTable(
