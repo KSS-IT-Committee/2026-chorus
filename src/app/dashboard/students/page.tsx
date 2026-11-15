@@ -11,6 +11,7 @@ import { StudentActions } from "@/components/StudentActions";
 import { ImportStudentsButton } from "@/components/ImportStudentsButton";
 import { getCurrentUser } from "@/lib/session";
 import { formatStudentId } from "@/lib/student-id";
+import { Internal } from "@/components/Internal";
 
 export const instant = false;
 
@@ -23,7 +24,7 @@ export default function StudentsPage({
 }) {
   return (
     <main className={styles.main}>
-      <AuthGuard minimumPermission="editor">
+      <AuthGuard minimumPermission="member">
         <StudentsContent searchParams={searchParams} />
       </AuthGuard>
     </main>
@@ -71,12 +72,14 @@ async function StudentsContent({
                 ? `${grade}年`
                 : "学年を選択"}
           </h2>
-          {className && (
-            <CreateStudentButton
-              grade={className.slice(0, 1)}
-              class={className.slice(1)}
-            />
-          )}
+          <Internal minimumPermission="editor">
+            {className && (
+              <CreateStudentButton
+                grade={className.slice(0, 1)}
+                class={className.slice(1)}
+              />
+            )}
+          </Internal>
         </div>
         {className ? (
           <StudentList className={className} />
@@ -85,7 +88,7 @@ async function StudentsContent({
             {(grade ? CLASS_LETTERS : GRADES).map((value) => {
               const count = grade
                 ? (counts.find((row) => row.className === `${grade}${value}`)
-                    ?.count ?? 0)
+                  ?.count ?? 0)
                 : 0;
               const hasEmptyClass =
                 !grade &&
@@ -157,9 +160,11 @@ async function StudentList({
             <td>{student.attendanceNumber}</td>
             <td>{formatStudentId(student.id)}</td>
             <td>{student.part}</td>
-            <td className={rosterStyles.actionCell}>
-              <StudentActions id={student.id} part={student.part} />
-            </td>
+            <Internal minimumPermission="editor">
+              <td className={rosterStyles.actionCell}>
+                <StudentActions id={student.id} part={student.part} />
+              </td>
+            </Internal>
           </tr>
         ))}
       </tbody>

@@ -43,8 +43,30 @@ export async function changeVoteAction(
         error: "投票が見つからないか、既に無効になっています。",
         success: false,
       };
-  } catch {
-    console.error("Failed to change vote");
+  } catch (error) {
+    const cause = error instanceof Error ? error.cause : null;
+    const constraint =
+      typeof cause === "object" && cause !== null && "constraint_name" in cause
+        ? cause.constraint_name
+        : undefined;
+    if (
+      (error instanceof Error && error.message === "Invalid audit reason") ||
+      constraint === "audit_logs_reason_required"
+    ) {
+      return {
+        error:
+          "理由を記録できなかったため、操作を中止しました。画面を再読み込みしてお試しください。",
+        success: false,
+      };
+    }
+    const code =
+      typeof cause === "object" &&
+      cause !== null &&
+      "code" in cause &&
+      typeof cause.code === "string"
+        ? cause.code
+        : undefined;
+    console.error("Failed to change vote", { code });
     return {
       error: "操作を完了できませんでした。時間をおいて再度お試しください。",
       success: false,

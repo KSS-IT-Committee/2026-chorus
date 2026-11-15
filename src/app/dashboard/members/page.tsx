@@ -4,13 +4,14 @@ import { getCurrentUser } from "@/lib/session";
 import { getMembers } from "@/db/getMembers";
 import Link from "next/link";
 import { CreateMemberButton } from "@/components/CreateMemberButton";
+import { Internal } from "@/components/Internal";
 
 export const instant = false;
 
 export default function MembersPage() {
   return (
     <main className={styles.main}>
-      <AuthGuard minimumPermission="admin">
+      <AuthGuard minimumPermission="member">
         <MembersContent />
       </AuthGuard>
     </main>
@@ -31,7 +32,10 @@ async function MembersContent() {
         <section className={styles.membersListContainer}>
           <div className={styles.titleContainer}>
             <h2 className={styles.subtitle}>委員アカウント一覧</h2>
-            <CreateMemberButton />
+            
+            <Internal minimumPermission="admin">
+              <CreateMemberButton />
+            </Internal>
           </div>
           {members.length ? (
             <ul className={styles.pageList}>

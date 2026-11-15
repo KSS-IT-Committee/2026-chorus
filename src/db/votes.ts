@@ -4,6 +4,7 @@ import { and, count, desc, eq, isNull, sql } from "drizzle-orm";
 import { auditLogs, students, votes } from "@/db/schema";
 import type { ClassName } from "@/lib/class-name";
 import { db } from "@/lib/db";
+import { getAuditReason } from "@/lib/audit-reason";
 
 export async function getVoteStudentSummaries(className?: ClassName) {
   return db
@@ -53,6 +54,8 @@ export async function changeVote(
   operatorName: string,
   reason: string,
 ) {
+  const auditReason = getAuditReason(reason);
+  if (!auditReason) throw new Error("Invalid audit reason");
   return db.transaction(async (tx) => {
     const condition = and(
       eq(votes.id, voteId),
@@ -77,7 +80,7 @@ export async function changeVote(
       action: operation === "delete" ? "vote.delete" : "vote.invalidate",
       targetType: "vote",
       targetId: String(voteId),
-      details: { studentId, grade: changed[0].grade, reason },
+      details: { studentId, grade: changed[0].grade, reason: auditReason },
     });
     return true;
   });
@@ -106,6 +109,8 @@ export async function addManualVote(
   operatorName: string,
   reason: string,
 ) {
+  const auditReason = getAuditReason(reason);
+  if (!auditReason) throw new Error("Invalid audit reason");
   return db.transaction(async (tx) => {
     const [created] = await tx
       .insert(votes)
@@ -116,7 +121,7 @@ export async function addManualVote(
       action: "vote.create_manual",
       targetType: "vote",
       targetId: String(created.id),
-      details: { grade, reason },
+      details: { grade, reason: auditReason },
     });
   });
 }

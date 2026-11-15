@@ -12,7 +12,12 @@ function load(path, modules) {
     { compilerOptions: { module: ts.ModuleKind.CommonJS } },
   ).outputText;
   const exports = {};
-  vm.runInNewContext(code, { exports, require: (id) => modules[id], console });
+  vm.runInNewContext(code, {
+    exports,
+    require: (id) => modules[id],
+    console,
+    Error,
+  });
   return exports;
 }
 const permission = load("../src/lib/permission.ts", {
@@ -20,6 +25,7 @@ const permission = load("../src/lib/permission.ts", {
 });
 let user = null;
 let found = true;
+let failure;
 const calls = [];
 const { changeVoteAction } = load(
   "../src/app/dashboard/votes/students/actions.ts",
@@ -28,6 +34,7 @@ const { changeVoteAction } = load(
     "@/db/votes": {
       changeVote: async (...args) => {
         calls.push(args);
+        if (failure) throw failure;
         return found;
       },
     },
@@ -84,4 +91,15 @@ test("vote mutations require operator permission and validate the target", async
     true,
   );
   assert.deepEqual(calls.at(-1), [null, 7, "delete", "operator", "確認のため"]);
+});
+
+test("a failed audit reason check explains that no vote was changed", async () => {
+  user = { username: "operator", permission: "operator" };
+  failure = new Error("Invalid audit reason");
+  assert.match((await submit()).error, /操作を中止/);
+  failure = new Error("query failure", {
+    cause: { code: "23514", constraint_name: "audit_logs_reason_required" },
+  });
+  assert.match((await submit()).error, /再読み込み/);
+  failure = undefined;
 });
