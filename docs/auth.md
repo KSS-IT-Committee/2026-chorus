@@ -8,6 +8,14 @@ DATABASE_URL='postgresql://...' node scripts/create-member.mjs USERNAME admin
 
 初期管理者を作るときは、上の例のように `admin` を指定します。権限を省略すると `member` になります。ユーザー名に `.` と `..` は使えません。既存のユーザー名は上書きされません。パスワードは scrypt でハッシュ化され、ログインに成功すると2日間有効なセッションを作成します。`getCurrentUser()` は有効なセッションの `{ username, permission }` を返し、未ログインの場合は `null` を返します。保護するページ、Server Action、Route Handler はそれぞれ認証を確認してください。
 
+本番用Dockerイメージをデプロイした後は、手元の端末からSSH経由で次のように実行できます。コンテナには `DATABASE_URL` を設定してください。
+
+```sh
+ssh -t USER@HOST 'docker exec -it CONTAINER node /app/scripts/create-member.mjs USERNAME admin'
+```
+
+`USER`、`HOST`、`CONTAINER`、`USERNAME` は実際の値に置き換えてください。パスワードは表示されるプロンプトに入力します。
+
 `Internal` は `minimumPermission` に指定した権限以上のメンバーに子要素を表示します。権限は高い順に `admin`、`operator`、`editor`、`member` です。表示の制限とは別に、データの取得や変更を行う処理でも権限を確認してください。
 
 ログイン試行回数の制限はプロセス単位です。複数台で運用する場合は共有の制限機構が必要です。また、大量の異なるユーザー名による試行を防ぐため、公開環境ではリバースプロキシなどでもリクエスト数を制限してください。
