@@ -64,6 +64,7 @@ const db = {
 };
 const {
   createStudent,
+  createStudents,
   deleteStudent,
   getStudents,
   getStudentCounts,
@@ -122,4 +123,25 @@ test("student counts are grouped by class", async () => {
   assert.equal(counts[0].className, "3A");
   assert.equal(counts[0].count, 4);
   assert.equal(calls.at(-1)[1], students.classname);
+});
+
+test("bulk creation validates all rows before inserting them together", async () => {
+  const valid = {
+    id: "3A22",
+    grade: 3,
+    class: "A",
+    attendanceNumber: 22,
+    part: "Alto",
+  };
+  const before = calls.length;
+  await assert.rejects(
+    createStudents([valid, { ...valid, part: "Other" }]),
+    /Invalid student data/,
+  );
+  assert.equal(calls.length, before);
+  await assert.rejects(createStudents([]), /No students/);
+  await createStudents([valid, { ...valid, id: "3A23", attendanceNumber: 23 }]);
+  assert.equal(calls.length, before + 1);
+  assert.equal(calls.at(-1)[1].length, 2);
+  assert.equal(calls.at(-1)[1][1].classname, "3A");
 });

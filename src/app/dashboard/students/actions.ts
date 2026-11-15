@@ -3,10 +3,17 @@
 import { revalidatePath } from "next/cache";
 
 import { PARTS } from "@/db/schema";
-import { createStudent, deleteStudent, updateStudentPart } from "@/db/students";
+import {
+  createStudent,
+  deleteStudent,
+  importStudents,
+  previewStudentImport,
+  updateStudentPart,
+} from "@/db/students";
 import { isClassLetter, isGrade } from "@/lib/class-name";
 import { hasMinimumPermission } from "@/lib/permission";
 import { getCurrentUser } from "@/lib/session";
+import { parseStudentCsv } from "@/lib/student-csv";
 
 export async function createStudentAction(
   _state: { error: string | null; success: boolean },
@@ -121,4 +128,101 @@ export async function updateStudentAction(
   if (!changed) return { error: "生徒が見つかりません。", success: false };
   revalidatePath("/dashboard/students");
   return { error: null, success: true };
+}
+
+export type ImportStudentsState = {
+  error: string | null;
+  success: boolean;
+  count: number;
+  newCount: number;
+  updates: { id: string; currentPart: string; part: string }[];
+  token: string;
+};
+
+export async function importStudentsAction(
+  _state: ImportStudentsState,
+  formData: FormData,
+): Promise<ImportStudentsState> {
+  const empty = {
+    success: false,
+    count: 0,
+    newCount: 0,
+    updates: [],
+    token: "",
+  };
+  const user = await getCurrentUser();
+  if (!hasMinimumPermission(user, "admin")) {
+    return { ...empty, error: "CSVを取り込む権限がありません。" };
+  }
+  const file = formData.get("file");
+  if (
+    !(file instanceof File) ||
+    !file.name.toLowerCase().endsWith(".csv") ||
+    file.size === 0 ||
+    file.size > 256 * 1024
+  ) {
+    return { ...empty, error: "256KB以下のCSVファイルを選択してください。" };
+  }
+  let roster: ReturnType<typeof parseStudentCsv>;
+  try {
+    roster = parseStudentCsv(
+      new TextDecoder("utf-8", { fatal: true }).decode(
+        await file.arrayBuffer(),
+      ),
+    );
+  } catch (error) {
+    return {
+      ...empty,
+      error:
+        error instanceof TypeError
+          ? "UTF-8のCSVファイルを選択してください。"
+          : error instanceof Error
+            ? error.message
+            : "CSVを読み取れませんでした。",
+    };
+  }
+  const intent = formData.get("intent");
+  try {
+    if (intent === "preview") {
+      const preview = await previewStudentImport(roster);
+      return { ...empty, ...preview, error: null };
+    }
+    const token = formData.get("token");
+    if (
+      intent !== "import" ||
+      typeof token !== "string" ||
+      !/^[a-f0-9]{64}$/.test(token)
+    ) {
+      return { ...empty, error: "登録内容をもう一度確認してください。" };
+    }
+    await importStudents(roster, token);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "";
+    if (
+      message === "生徒番号と出席番号が登録済みのデータと一致しません。" ||
+      message ===
+        "確認後に生徒データが変更されました。もう一度確認してください。"
+    ) {
+      return { ...empty, error: message };
+    }
+    const cause = error instanceof Error ? error.cause : null;
+    if (
+      typeof cause === "object" &&
+      cause !== null &&
+      "code" in cause &&
+      cause.code === "23505"
+    ) {
+      return {
+        ...empty,
+        error: "生徒データが重複しています。もう一度確認してください。",
+      };
+    }
+    console.error("Failed to import students");
+    return {
+      ...empty,
+      error: "生徒を登録できませんでした。時間をおいて再度お試しください。",
+    };
+  }
+  revalidatePath("/dashboard/students");
+  return { ...empty, error: null, success: true, count: roster.length };
 }

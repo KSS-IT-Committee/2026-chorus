@@ -1,0 +1,15 @@
+.updates {
+  max-height: 240px;
+  overflow-y: auto;
+  list-style: none;
+  border-top: 1px solid var(--theme-border);
+}
+
+.updates li {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--theme-border);
+  overflow-wrap: anywhere;
+}

@@ -6,12 +6,15 @@ import ts from "typescript";
 import * as jsx from "react/jsx-runtime";
 
 const queries = [];
+let permission = "editor";
 const modules = {
   "react/jsx-runtime": jsx,
   "next/link": { default: () => null },
   "@/components/Authguard": { AuthGuard: () => null },
   "@/components/CreateStudentButton": { CreateStudentButton: () => null },
   "@/components/StudentActions": { StudentActions: () => null },
+  "@/components/ImportStudentsButton": { ImportStudentsButton: () => null },
+  "@/lib/session": { getCurrentUser: async () => ({ permission }) },
   "@/lib/class-name": {
     GRADES: [1, 2, 3],
     CLASS_LETTERS: ["A", "B", "C", "D"],
@@ -99,4 +102,16 @@ test("selection lists show missing classes and registered student counts", async
   assert.equal(first[2], false);
   assert.equal(second[0], 0);
   assert.equal(second[2], "（未登録）");
+});
+
+test("CSV import control is shown only to admins", async () => {
+  permission = "editor";
+  let header = (await content({})).props.children[1];
+  assert.equal(header.props.children[1], false);
+  permission = "admin";
+  header = (await content({})).props.children[1];
+  assert.equal(
+    header.props.children[1].type,
+    modules["@/components/ImportStudentsButton"].ImportStudentsButton,
+  );
 });

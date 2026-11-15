@@ -8,6 +8,8 @@ import rosterStyles from "./page.module.css";
 import { AutoRefresh } from "./AutoRefresh";
 import { CreateStudentButton } from "@/components/CreateStudentButton";
 import { StudentActions } from "@/components/StudentActions";
+import { ImportStudentsButton } from "@/components/ImportStudentsButton";
+import { getCurrentUser } from "@/lib/session";
 
 export const instant = false;
 
@@ -33,6 +35,7 @@ async function StudentsContent({
   searchParams: SearchParams;
 }) {
   const params = await searchParams;
+  const user = await getCurrentUser();
   const grade = GRADES.find((value) => String(value) === params.grade);
   const className =
     grade && typeof params.class === "string"
@@ -42,7 +45,10 @@ async function StudentsContent({
   return (
     <>
       <AutoRefresh />
-      <h1 className={styles.title}>生徒名簿</h1>
+      <div className={rosterStyles.pageHeader}>
+        <h1 className={styles.title}>生徒名簿</h1>
+        {user?.permission === "admin" && <ImportStudentsButton />}
+      </div>
       <section className={rosterStyles.content}>
         {grade && (
           <Link
