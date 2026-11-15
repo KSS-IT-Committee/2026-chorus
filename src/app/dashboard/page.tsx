@@ -9,7 +9,7 @@ export const instant = false;
 
 const pageList = [
   { href: "/songs", title: "曲目登録" },
-  { href: "/students", title: "生徒名簿登録" },
+  { href: "/students", title: "生徒名簿" },
   { href: "/votes", title: "投票結果確認" },
   { href: "/audit", title: "操作履歴" },
   { href: "/members", title: "委員アカウント管理" },

@@ -1,0 +1,1 @@
+ALTER TABLE "students" ADD COLUMN IF NOT EXISTS "part" "part" NOT NULL;
