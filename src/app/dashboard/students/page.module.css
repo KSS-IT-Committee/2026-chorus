@@ -79,3 +79,18 @@
   flex-wrap: wrap;
   gap: 16px;
 }
+
+.voteRow {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  min-height: 64px;
+  padding: 10px 16px;
+}
+
+.voteNote {
+  margin-top: 12px;
+  color: var(--theme-muted);
+  font-size: 0.875rem;
+  line-height: 1.6;
+}
