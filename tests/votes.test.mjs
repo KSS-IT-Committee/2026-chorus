@@ -20,20 +20,32 @@ registerHooks({
   },
 });
 
-const [{ registerVote }, { students, votes }] = await Promise.all([
-  import("../src/db/votes.ts"),
-  import("../src/db/schema.ts"),
-]);
+const [{ getVoteProgress, registerVote }, { students, votes }] =
+  await Promise.all([
+    import("../src/db/votes.ts"),
+    import("../src/db/schema.ts"),
+  ]);
 
 function createExecutor({
   existingVotes = [],
   student = { id: "student-1" },
+  roster = [student].filter(Boolean),
 } = {}) {
   const savedVotes = [...existingVotes];
   let currentRequestId;
   const executor = {
     select: () => ({
       from: (table) => ({
+        leftJoin: () => ({
+          where: async () =>
+            roster.map((member) => ({
+              voteId: savedVotes.some(
+                (vote) => vote.studentId === member.id && vote.grade === 1,
+              )
+                ? 1
+                : null,
+            })),
+        }),
         where: () => ({
           limit: async () => {
             if (table === students) return student ? [student] : [];
@@ -79,6 +91,7 @@ const submission = {
   requestId: "123e4567-e89b-42d3-a456-426614174000",
   grade: 1,
   classname: "1A",
+  part: "Soprano",
   attendanceNumber: 1,
   firstClass: "1B",
   secondClass: "1C",
@@ -121,4 +134,16 @@ test("returns student-not-found when the roster has no matching student", async 
   const { executor } = createExecutor({ student: null });
 
   assert.equal(await registerVote(submission, executor), "student-not-found");
+});
+
+test("counts registered students and restores the saved vote progress", async () => {
+  const { executor } = createExecutor({
+    existingVotes: [{ studentId: "student-1", grade: 1 }],
+    roster: [{ id: "student-1" }, { id: "student-2" }, { id: "student-3" }],
+  });
+
+  assert.deepEqual(await getVoteProgress("1A", "Soprano", 1, executor), {
+    registeredCount: 3,
+    votedCount: 1,
+  });
 });

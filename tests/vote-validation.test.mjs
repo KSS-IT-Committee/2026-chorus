@@ -21,6 +21,7 @@ test("parses a valid vote and normalizes its class names", () => {
       grade: "2",
       requestId: "123e4567-e89b-42d3-a456-426614174000",
       className: "a",
+      part: "Soprano",
       attendanceNumber: 12,
       firstClass: "B",
       secondClass: "D",
@@ -29,6 +30,7 @@ test("parses a valid vote and normalizes its class names", () => {
       requestId: "123e4567-e89b-42d3-a456-426614174000",
       grade: 2,
       classname: "2A",
+      part: "Soprano",
       attendanceNumber: 12,
       firstClass: "2B",
       secondClass: "2D",
@@ -43,6 +45,7 @@ test("rejects malformed or out-of-range voter data", () => {
         grade: 1,
         requestId: "123e4567-e89b-42d3-a456-426614174000",
         className: "A",
+        part: "Soprano",
         attendanceNumber,
         firstClass: "B",
         secondClass: "C",
@@ -57,6 +60,7 @@ test("rejects malformed or out-of-range voter data", () => {
       grade: "4",
       requestId: "123e4567-e89b-42d3-a456-426614174000",
       className: "A",
+      part: "Soprano",
       attendanceNumber: 1,
       firstClass: "B",
       secondClass: "C",
@@ -70,6 +74,7 @@ test("rejects same-class, self-class, and invalid-class choices", () => {
     grade: 1,
     requestId: "123e4567-e89b-42d3-a456-426614174000",
     className: "A",
+    part: "Soprano",
     attendanceNumber: 1,
     firstClass: "B",
     secondClass: "C",
@@ -85,6 +90,7 @@ test("requires a UUID request identifier", () => {
     grade: 1,
     requestId: "123e4567-e89b-42d3-a456-426614174000",
     className: "A",
+    part: "Soprano",
     attendanceNumber: 1,
     firstClass: "B",
     secondClass: "C",
@@ -94,4 +100,19 @@ test("requires a UUID request identifier", () => {
     parseVoteSubmission({ ...input, requestId: "not-a-uuid" }),
     null,
   );
+});
+
+test("requires a valid part", () => {
+  const input = {
+    grade: 1,
+    requestId: "123e4567-e89b-42d3-a456-426614174000",
+    className: "A",
+    part: "Soprano",
+    attendanceNumber: 1,
+    firstClass: "B",
+    secondClass: "C",
+  };
+
+  assert.equal(parseVoteSubmission({ ...input, part: "Unknown" }), null);
+  assert.equal(parseVoteSubmission({ ...input, part: undefined }), null);
 });

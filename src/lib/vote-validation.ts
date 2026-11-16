@@ -1,9 +1,11 @@
+import { PARTS } from "@/db/schema";
 import { isGrade, toClassName } from "@/lib/class-name";
 
 export type VoteSubmission = {
   requestId: string;
   grade: number;
   classname: NonNullable<ReturnType<typeof toClassName>>;
+  part: (typeof PARTS)[number];
   attendanceNumber: number;
   firstClass: NonNullable<ReturnType<typeof toClassName>>;
   secondClass: NonNullable<ReturnType<typeof toClassName>>;
@@ -33,8 +35,14 @@ export function parseVoteSubmission(value: unknown): VoteSubmission | null {
         : NaN;
   if (!isGrade(grade)) return null;
 
+  const part =
+    typeof value.part === "string"
+      ? PARTS.find((candidate) => candidate === value.part)
+      : undefined;
+
   if (
     typeof value.className !== "string" ||
+    !part ||
     typeof value.attendanceNumber !== "number" ||
     !Number.isInteger(value.attendanceNumber) ||
     value.attendanceNumber < 1 ||
@@ -64,6 +72,7 @@ export function parseVoteSubmission(value: unknown): VoteSubmission | null {
     requestId: value.requestId,
     grade,
     classname,
+    part,
     attendanceNumber: value.attendanceNumber,
     firstClass,
     secondClass,

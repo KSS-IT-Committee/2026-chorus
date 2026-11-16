@@ -13,6 +13,32 @@ export type RegisterVoteResult =
   | "already-voted"
   | "idempotency-conflict";
 
+export type VoteProgress = {
+  registeredCount: number;
+  votedCount: number;
+};
+
+export async function getVoteProgress(
+  classname: VoteSubmission["classname"],
+  part: VoteSubmission["part"],
+  grade: number,
+  executor: Executor = db,
+): Promise<VoteProgress> {
+  const roster = await executor
+    .select({ voteId: votes.id })
+    .from(students)
+    .leftJoin(
+      votes,
+      and(eq(votes.studentId, students.id), eq(votes.grade, grade)),
+    )
+    .where(and(eq(students.classname, classname), eq(students.part, part)));
+
+  return {
+    registeredCount: roster.length,
+    votedCount: roster.filter((student) => student.voteId !== null).length,
+  };
+}
+
 function getDuplicateConstraint(error: unknown): string | undefined {
   let current = error;
   const seen = new Set<object>();
@@ -50,6 +76,7 @@ export async function registerVote(
     .where(
       and(
         eq(students.classname, submission.classname),
+        eq(students.part, submission.part),
         eq(students.attendanceNumber, submission.attendanceNumber),
       ),
     )
