@@ -100,57 +100,6 @@
   font-weight: 700;
 }
 
-.numberInputWrap {
-  position: relative;
-  display: flex;
-  align-items: center;
-}
-
-.numberInputWrap input {
-  width: 100%;
-  min-width: 0;
-  height: 56px;
-  padding: 0 42px 0 16px;
-  border: 1px solid var(--theme-border);
-  border-radius: 8px;
-  outline: none;
-  appearance: textfield;
-  background: var(--theme-input-surface);
-  color: var(--theme-input-text);
-  font: inherit;
-  font-size: 18px;
-  transition:
-    border-color 150ms ease,
-    box-shadow 150ms ease;
-}
-
-.numberInputWrap input:focus {
-  border-color: var(--theme-accent);
-  box-shadow: 0 0 0 3px rgba(86, 101, 165, 0.16);
-}
-
-@media (forced-colors: active) {
-  .numberInputWrap input:focus {
-    outline: 2px solid CanvasText;
-    outline-offset: 2px;
-    box-shadow: none;
-  }
-}
-
-.numberInputWrap input::-webkit-inner-spin-button,
-.numberInputWrap input::-webkit-outer-spin-button {
-  margin: 0;
-  appearance: none;
-}
-
-.inputSuffix {
-  position: absolute;
-  right: 14px;
-  color: var(--theme-muted);
-  font-size: 17px;
-  pointer-events: none;
-}
-
 .fieldHint {
   margin-top: -3px;
   color: var(--theme-muted);
@@ -314,7 +263,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .numberInputWrap input,
   .primaryButton,
   .BackToTopButton {
     transition: none;

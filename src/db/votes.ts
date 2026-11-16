@@ -1,6 +1,6 @@
 import "server-only";
 
-import { and, eq } from "drizzle-orm";
+import { and, asc, eq } from "drizzle-orm";
 
 import { students, votes } from "@/db/schema";
 import { db, type Executor } from "@/lib/db";
@@ -16,6 +16,10 @@ export type RegisterVoteResult =
 export type VoteProgress = {
   registeredCount: number;
   votedCount: number;
+  students: {
+    attendanceNumber: number;
+    voted: boolean;
+  }[];
 };
 
 export async function getVoteProgress(
@@ -25,17 +29,25 @@ export async function getVoteProgress(
   executor: Executor = db,
 ): Promise<VoteProgress> {
   const roster = await executor
-    .select({ voteId: votes.id })
+    .select({
+      attendanceNumber: students.attendanceNumber,
+      voteId: votes.id,
+    })
     .from(students)
     .leftJoin(
       votes,
       and(eq(votes.studentId, students.id), eq(votes.grade, grade)),
     )
-    .where(and(eq(students.classname, classname), eq(students.part, part)));
+    .where(and(eq(students.classname, classname), eq(students.part, part)))
+    .orderBy(asc(students.attendanceNumber));
 
   return {
     registeredCount: roster.length,
     votedCount: roster.filter((student) => student.voteId !== null).length,
+    students: roster.map((student) => ({
+      attendanceNumber: student.attendanceNumber,
+      voted: student.voteId !== null,
+    })),
   };
 }
 

@@ -1,8 +1,15 @@
 "use client";
 
-import { Suspense, useEffect, useState, type SubmitEvent } from "react";
+import {
+  Suspense,
+  useEffect,
+  useMemo,
+  useState,
+  type SubmitEvent,
+} from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import AbsenceSelector from "@/components/AbsenceSelector";
 import InformationNote from "@/components/InformationNote";
 import PullDown from "@/components/PullDown";
 import StepHeading from "@/components/StepHeading";
@@ -32,6 +39,10 @@ type VoteProgressResponse = {
   registeredCount: number;
   votedCount: number;
   absentCount: number;
+  students: {
+    attendanceNumber: number;
+    voted: boolean;
+  }[];
 };
 type Vote = {
   requestId: string;
@@ -52,8 +63,21 @@ function isVoteProgress(value: unknown): value is VoteProgressResponse {
     "absentCount" in value &&
     typeof value.absentCount === "number" &&
     Number.isInteger(value.absentCount) &&
+    "students" in value &&
+    Array.isArray(value.students) &&
     value.votedCount <= value.registeredCount &&
-    value.absentCount === value.registeredCount - value.votedCount
+    value.absentCount === value.registeredCount - value.votedCount &&
+    value.students.length === value.registeredCount &&
+    value.students.every(
+      (student) =>
+        typeof student === "object" &&
+        student !== null &&
+        "attendanceNumber" in student &&
+        typeof student.attendanceNumber === "number" &&
+        Number.isInteger(student.attendanceNumber) &&
+        "voted" in student &&
+        typeof student.voted === "boolean",
+    )
   );
 }
 
@@ -76,21 +100,21 @@ function VoteRehearsalContent() {
   const restoredPart = parts.find(
     (item) => item.value === searchParams.get("part"),
   );
-  const restoredCount = searchParams.get("count") ?? "";
   const restoredStep = searchParams.get("step");
-  const validRestoredCount =
-    /^[1-9]\d*$/.test(restoredCount) && Number(restoredCount) <= 40;
   const hasRestoredConfig = Boolean(
-    restoredGrade && restoredClass && restoredPart && validRestoredCount,
+    restoredGrade && restoredClass && restoredPart,
   );
   const [grade, setGrade] = useState<Grade | "">(restoredGrade ?? ""); // 学年
   const [className, setClassName] = useState<ClassName | "">(
     restoredClass ?? "",
   ); // クラス
   const [part, setPart] = useState<Part | "">(restoredPart?.value ?? ""); // パート
-  const [memberCount, setMemberCount] = useState(
-    hasRestoredConfig ? restoredCount : "",
-  ); // 人数
+  const [absentAttendanceNumbers, setAbsentAttendanceNumbers] = useState(
+    searchParams
+      .getAll("absent")
+      .filter((value) => /^[1-9]\d*$/.test(value))
+      .map(Number),
+  );
   const [step, setStep] = useState<VotePageStep>(
     hasRestoredConfig &&
       (restoredStep === "voting" || restoredStep === "finished")
@@ -149,16 +173,17 @@ function VoteRehearsalContent() {
     return () => controller.abort();
   }, [className, grade, part]);
 
-  const count = Number(memberCount);
-  const hasCurrentRoster = Boolean(
+  const currentRoster =
     rosterProgress &&
     grade &&
     className &&
     part &&
     rosterProgress.grade === grade &&
     rosterProgress.className === className &&
-    rosterProgress.part === part,
-  );
+    rosterProgress.part === part
+      ? rosterProgress
+      : null;
+  const hasCurrentRoster = currentRoster !== null;
   const currentRosterError =
     rosterError?.grade === grade &&
     rosterError.className === className &&
@@ -169,37 +194,35 @@ function VoteRehearsalContent() {
     grade && className && part && !hasCurrentRoster && !currentRosterError,
   );
 
+  const absentStudents = useMemo(
+    () =>
+      rosterProgress?.students.filter(
+        (student) =>
+          absentAttendanceNumbers.includes(student.attendanceNumber) &&
+          !student.voted,
+      ) ?? [],
+    [absentAttendanceNumbers, rosterProgress],
+  );
+  const count = currentRoster
+    ? currentRoster.registeredCount - absentStudents.length
+    : 0;
+  const maxAbsentCount = currentRoster
+    ? currentRoster.registeredCount - Math.max(currentRoster.votedCount, 1)
+    : 0;
   const validCount =
-    Number.isInteger(count) &&
+    currentRoster !== null &&
     count >= 1 &&
-    hasCurrentRoster &&
-    rosterProgress !== null &&
-    count <= rosterProgress.registeredCount &&
-    count >= rosterProgress.votedCount;
-  const hasInvalidResumedCount =
-    step !== "setup" &&
-    hasCurrentRoster &&
-    rosterProgress !== null &&
-    (count > rosterProgress.registeredCount ||
-      count < rosterProgress.votedCount ||
-      !Number.isInteger(count) ||
-      count < 1);
-  const visibleStep = hasInvalidResumedCount
+    count >= currentRoster.votedCount &&
+    absentStudents.length <= maxAbsentCount;
+  const hasInvalidResumedConfig =
+    step !== "setup" && hasCurrentRoster && !validCount;
+  const visibleStep = hasInvalidResumedConfig
     ? "setup"
     : step === "voting" &&
-        hasCurrentRoster &&
-        rosterProgress !== null &&
-        rosterProgress.votedCount >= count
+        currentRoster !== null &&
+        currentRoster.votedCount >= count
       ? "finished"
       : step;
-  const memberCountError =
-    hasCurrentRoster &&
-    rosterProgress &&
-    memberCount !== "" &&
-    (count > rosterProgress.registeredCount ||
-      count < rosterProgress.votedCount)
-      ? "投票済み人数以上、名簿の登録人数以下を入力してください。"
-      : null;
 
   useEffect(() => {
     const url = new URL(window.location.href);
@@ -207,25 +230,26 @@ function VoteRehearsalContent() {
       grade,
       className,
       part,
-      count: memberCount,
       step: visibleStep,
     };
     for (const [key, value] of Object.entries(values)) {
       if (value) url.searchParams.set(key, value);
       else url.searchParams.delete(key);
     }
+    url.searchParams.delete("count");
+    url.searchParams.delete("absent");
+    if (hasCurrentRoster) {
+      for (const student of absentStudents) {
+        url.searchParams.append("absent", String(student.attendanceNumber));
+      }
+    }
     const updatedUrl = `${url.pathname}${url.search}${url.hash}`;
     const currentUrl = `${window.location.pathname}${window.location.search}${window.location.hash}`;
     if (currentUrl !== updatedUrl) {
       window.history.replaceState(null, "", updatedUrl);
     }
-  }, [className, grade, memberCount, part, visibleStep]);
+  }, [absentStudents, className, grade, hasCurrentRoster, part, visibleStep]);
 
-  const validAttendanceNumber =
-    attendanceNumber !== "" &&
-    Number.isInteger(Number(attendanceNumber)) &&
-    Number(attendanceNumber) >= 1 &&
-    Number(attendanceNumber) <= 40;
   const canStart = Boolean(
     grade &&
     className &&
@@ -247,11 +271,34 @@ function VoteRehearsalContent() {
   const secondTargetClassOptions = targetClassOptions.filter(
     (item) => item.value !== targetClass,
   );
+  const attendanceNumberOptions =
+    currentRoster?.students
+      .filter(
+        (student) =>
+          !student.voted &&
+          !absentAttendanceNumbers.includes(student.attendanceNumber),
+      )
+      .map((student) => ({
+        value: String(student.attendanceNumber),
+        label: `${student.attendanceNumber}番`,
+      })) ?? [];
+  const validAttendanceNumber = attendanceNumberOptions.some(
+    (option) => option.value === attendanceNumber,
+  );
 
   function startVoting(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!canStart) return;
     setStep(votedCount >= count ? "finished" : "voting");
+  }
+
+  function setVoteGroupValue<T extends Grade | ClassName | Part>(
+    setter: (value: T | "") => void,
+    value: T | "",
+  ) {
+    setter(value);
+    setAbsentAttendanceNumbers([]);
+    setStep("setup");
   }
 
   function submitVote(event: SubmitEvent<HTMLFormElement>) {
@@ -324,6 +371,11 @@ function VoteRehearsalContent() {
               ...current,
               votedCount: updatedVotedCount,
               absentCount: current.registeredCount - updatedVotedCount,
+              students: current.students.map((student) =>
+                student.attendanceNumber === pendingVote.attendanceNumber
+                  ? { ...student, voted: true }
+                  : student,
+              ),
             }
           : current,
       );
@@ -357,7 +409,7 @@ function VoteRehearsalContent() {
               <StepHeading
                 step="01"
                 title="投票者情報を入力"
-                description="投票する人数を入力してください。"
+                description="学年・クラス・パートを選び、欠席者を選択してください。"
               />
             )}
 
@@ -389,74 +441,63 @@ function VoteRehearsalContent() {
                         value: item,
                         label: `${item}年`,
                       }))}
-                      onChange={setGrade}
+                      onChange={(value) => setVoteGroupValue(setGrade, value)}
                     />
                     <PullDown
                       label="クラス"
                       value={className}
                       options={classOptions}
-                      onChange={setClassName}
+                      onChange={(value) =>
+                        setVoteGroupValue(setClassName, value)
+                      }
                     />
                     <PullDown
                       label="パート"
                       value={part}
                       options={parts}
-                      onChange={setPart}
+                      onChange={(value) => setVoteGroupValue(setPart, value)}
                     />
-
-                    <label className={styles.field}>
-                      <span className={styles.labelText}>投票する人数</span>
-                      <span className={styles.numberInputWrap}>
-                        <input
-                          required
-                          type="number"
-                          min="1"
-                          max={rosterProgress?.registeredCount ?? 40}
-                          step="1"
-                          inputMode="numeric"
-                          value={memberCount}
-                          onChange={(event) => {
-                            setMemberCount(event.target.value);
-                            setStep("setup");
-                          }}
-                          disabled={isLoadingRoster}
-                          aria-describedby="member-count-help"
-                        />
-                        <span className={styles.inputSuffix}>人</span>
-                      </span>
-                      <span id="member-count-help" className={styles.fieldHint}>
-                        {hasCurrentRoster && rosterProgress
-                          ? `1〜${rosterProgress.registeredCount}人`
-                          : "パートを選ぶと名簿の人数が表示されます。"}
-                      </span>
-                    </label>
                   </div>
                 </fieldset>
+
+                {grade &&
+                  className &&
+                  part &&
+                  (isLoadingRoster ? (
+                    <p>名簿を確認しています…</p>
+                  ) : hasCurrentRoster && rosterProgress ? (
+                    <AbsenceSelector
+                      students={rosterProgress.students}
+                      selectedAttendanceNumbers={absentAttendanceNumbers}
+                      maxAbsentCount={maxAbsentCount}
+                      onChange={(attendanceNumbers) => {
+                        setAbsentAttendanceNumbers(attendanceNumbers);
+                        setStep("setup");
+                      }}
+                    />
+                  ) : (
+                    <p>
+                      {currentRosterError ?? "名簿の状況を確認できません。"}
+                    </p>
+                  ))}
 
                 {grade && className && part && (
                   <InformationNote>
                     {isLoadingRoster
                       ? "名簿を確認しています…"
                       : hasCurrentRoster && rosterProgress
-                        ? `名簿登録 ${rosterProgress.registeredCount}人・投票済み ${rosterProgress.votedCount}人・未投票（DB上） ${rosterProgress.absentCount}人`
+                        ? `名簿登録 ${rosterProgress.registeredCount}人・投票済み ${rosterProgress.votedCount}人・未投票 ${rosterProgress.absentCount}人`
                         : (currentRosterError ??
                           "名簿の状況を確認できません。")}
                     {hasCurrentRoster && rosterProgress && (
                       <>
                         <br />
-                        {validCount
-                          ? `今回の投票予定 ${count}人・欠席見込み ${rosterProgress.registeredCount - count}人`
-                          : "投票人数を入力すると欠席見込みを確認できます。"}
+                        {`今回の投票予定 ${count}人・欠席者 ${absentStudents.length}人`}
                       </>
                     )}
                   </InformationNote>
                 )}
                 {currentRosterError && <p role="alert">{currentRosterError}</p>}
-                {memberCountError && <p role="alert">{memberCountError}</p>}
-
-                <InformationNote>
-                  投票を確定すると、名簿と照合したうえでデータベースに保存されます。
-                </InformationNote>
 
                 <button
                   className={styles.primaryButton}
@@ -478,11 +519,11 @@ function VoteRehearsalContent() {
                     {parts.find((item) => item.value === part)?.label}
                   </strong>
                   <span className={styles.summaryCount}>
-                    全{count}人・欠席見込み
+                    全{count}人・欠席
                     {rosterProgress
                       ? rosterProgress.registeredCount - count
                       : 0}
-                    人・未投票（DB上）
+                    人・未投票
                     {rosterProgress?.absentCount ?? 0}人
                   </span>
                 </div>
@@ -492,24 +533,13 @@ function VoteRehearsalContent() {
                 {currentRosterError && <p role="alert">{currentRosterError}</p>}
 
                 <form className={styles.voteForm} onSubmit={submitVote}>
-                  <label className={styles.field}>
-                    <span className={styles.labelText}>出席番号</span>
-                    <span className={styles.numberInputWrap}>
-                      <input
-                        required
-                        type="text"
-                        inputMode="numeric"
-                        pattern="[0-9]{1,2}"
-                        maxLength={2}
-                        placeholder="1〜40で入力してください"
-                        value={attendanceNumber}
-                        onChange={(event) =>
-                          setAttendanceNumber(event.target.value)
-                        }
-                      />
-                      <span className={styles.inputSuffix}>番</span>
-                    </span>
-                  </label>
+                  <PullDown
+                    label="出席番号"
+                    value={attendanceNumber}
+                    options={attendanceNumberOptions}
+                    placeholder="出席番号を選択してください"
+                    onChange={setAttendanceNumber}
+                  />
 
                   <PullDown
                     label="1番投票したいクラス"
@@ -568,7 +598,7 @@ function VoteRehearsalContent() {
                   {rosterProgress && (
                     <>
                       <br />
-                      欠席見込み {rosterProgress.registeredCount - count}人
+                      欠席 {rosterProgress.registeredCount - count}人
                     </>
                   )}
                 </p>
