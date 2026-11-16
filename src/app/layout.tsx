@@ -25,8 +25,8 @@ export const metadata: Metadata = {
   title: "合唱発表会",
   description: "都立小石川合唱発表会",
   icons: {
-    icon: "/favicon.svg"
-  }
+    icon: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
