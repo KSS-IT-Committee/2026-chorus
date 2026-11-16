@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256">
+  <rect width="256" height="256" rx="32" fill="#111B3A"/>
+
+  <g transform="translate(128 128) scale(1.25) translate(-128 -128)">
+    <!-- 合の上部：人（開き約110°）＋短めの一 -->
+    <g fill="none" stroke="#FFD84D" stroke-width="10"
+       stroke-linecap="round" stroke-linejoin="round">
+      <path d="M128 53 L61 100"/>
+      <path d="M128 53 L195 100"/>
+      <path d="M88 111 H168"/>
+    </g>
+
+    <!-- 5つのきらめき -->
+    <g fill="#FFD84D">
+      <path transform="translate(128 53) scale(1.35) translate(-128 -53)"
+        d="M128 42 C130 49 132 51 139 53 C132 55 130 57 128 64 C126 57 124 55 117 53 C124 51 126 49 128 42Z"/>
+      <path transform="translate(61 100) scale(1.35) translate(-61 -100)"
+        d="M61 90 C63 96 65 98 71 100 C65 102 63 104 61 110 C59 104 57 102 51 100 C57 98 59 96 61 90Z"/>
+      <path transform="translate(195 100) scale(1.35) translate(-195 -100)"
+        d="M195 90 C197 96 199 98 205 100 C199 102 197 104 195 110 C193 104 191 102 185 100 C191 98 193 96 195 90Z"/>
+      <path transform="translate(88 111) scale(1.35) translate(-88 -111)"
+        d="M88 101 C90 107 92 109 98 111 C92 113 90 115 88 121 C86 115 84 113 78 111 C84 109 86 107 88 101Z"/>
+      <path transform="translate(168 111) scale(1.35) translate(-168 -111)"
+        d="M168 101 C170 107 172 109 178 111 C172 113 170 115 168 121 C166 115 164 113 158 111 C164 109 166 107 168 101Z"/>
+    </g>
+
+    <!-- 付点8分音符＋16分音符 -->
+    <g transform="translate(128 170) scale(0.82) translate(-128 -170)"
+       fill="#FFD84D" stroke="#FFD84D"
+       stroke-linecap="round" stroke-linejoin="round">
+      <!-- 楕円だけ小さく -->
+      <ellipse cx="76" cy="190" rx="13.5" ry="8.5"
+        transform="rotate(-25 76 190)"/>
+      <ellipse cx="158" cy="190" rx="13.5" ry="8.5"
+        transform="rotate(-25 158 190)"/>
+
+      <path d="M90 187 V130" fill="none" stroke-width="7"/>
+      <path d="M172 187 V130" fill="none" stroke-width="7"/>
+
+      <path d="M90 130 H172 V140 H90 Z"/>
+      <!-- 16分音符側の補助連桁を少し長く、太く -->
+      <path d="M120 170 H172 V158 H120 Z"/>
+    </g>
+
+    <!-- 付点の星 -->
+    <path fill="#FFD84D"
+      transform="translate(108 169) scale(1.5) translate(-116 -187)"
+      d="M116 177 C118 183 120 185 126 187 C120 189 118 191 116 197 C114 191 112 189 106 187 C112 185 114 183 116 177Z"/>
+  </g>
+</svg>
