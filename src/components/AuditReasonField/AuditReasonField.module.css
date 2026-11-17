@@ -1,0 +1,16 @@
+.input {
+  width: 100%;
+  min-height: 88px;
+  padding: 9px 12px;
+  color: var(--theme-text);
+  background: var(--background);
+  border: 1px solid var(--theme-border);
+  border-radius: 6px;
+  font: inherit;
+  resize: vertical;
+}
+
+.input:focus-visible {
+  outline: 3px solid var(--theme-focus);
+  outline-offset: 2px;
+}

@@ -37,14 +37,17 @@ function createExecutor({
     select: () => ({
       from: (table) => ({
         leftJoin: () => ({
-          where: async () =>
-            roster.map((member) => ({
-              voteId: savedVotes.some(
-                (vote) => vote.studentId === member.id && vote.grade === 1,
-              )
-                ? 1
-                : null,
-            })),
+          where: () => ({
+            orderBy: async () =>
+              roster.map((member, index) => ({
+                attendanceNumber: index + 1,
+                voteId: savedVotes.some(
+                  (vote) => vote.studentId === member.id && vote.grade === 1,
+                )
+                  ? 1
+                  : null,
+              })),
+          }),
         }),
         where: () => ({
           limit: async () => {
@@ -145,5 +148,10 @@ test("counts registered students and restores the saved vote progress", async ()
   assert.deepEqual(await getVoteProgress("1A", "Soprano", 1, executor), {
     registeredCount: 3,
     votedCount: 1,
+    students: [
+      { attendanceNumber: 1, voted: true },
+      { attendanceNumber: 2, voted: false },
+      { attendanceNumber: 3, voted: false },
+    ],
   });
 });

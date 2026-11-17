@@ -1,0 +1,55 @@
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 40px;
+}
+
+.actions button {
+  min-height: 44px;
+  padding: 10px 16px;
+  color: var(--theme-text);
+  background: var(--theme-surface);
+  border: 1px solid var(--theme-border);
+  border-radius: 8px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.actions button:focus-visible {
+  outline: 3px solid var(--theme-focus);
+  outline-offset: 3px;
+}
+
+.actions button:hover {
+  background: var(--theme-surface-soft);
+}
+
+.actions .danger {
+  color: var(--theme-error);
+  border-color: currentColor;
+}
+
+.dangerSubmit {
+  color: #fff;
+  background: #9b1c1c;
+}
+
+.dangerSubmit:hover {
+  background: #771515;
+}
+
+.target {
+  overflow-wrap: anywhere;
+  font-weight: 700;
+}
+
+.dialogText {
+  color: var(--theme-muted);
+  line-height: 1.6;
+}
+
+.status {
+  margin-top: 20px;
+}

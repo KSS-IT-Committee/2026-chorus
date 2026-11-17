@@ -6,6 +6,7 @@ const nextConfig: NextConfig = {
   // `node server.js` instead of `next start`.
   output: "standalone",
   cacheComponents: true,
+  experimental: { authInterrupts: true },
   partialPrefetching: true,
   reactCompiler: true,
 };

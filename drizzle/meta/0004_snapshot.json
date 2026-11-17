@@ -1,5 +1,5 @@
 {
-  "id": "2c1516be-bc54-40f3-af8e-b4852890a8bb",
+  "id": "a72fca83-9acd-4871-bf70-6ff5047d510d",
   "prevId": "f6bd06e8-0a53-4793-adfe-042b44cd0831",
   "version": "7",
   "dialect": "postgresql",
@@ -135,20 +135,20 @@
             }
           ],
           "isUnique": false,
-          "concurrently": false,
+          "with": {},
           "method": "btree",
-          "with": {}
+          "concurrently": false
         }
       },
       "foreignKeys": {
         "sessions_username_members_username_fk": {
           "name": "sessions_username_members_username_fk",
           "tableFrom": "sessions",
-          "tableTo": "members",
           "columnsFrom": ["username"],
+          "tableTo": "members",
           "columnsTo": ["username"],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "cascade"
         }
       },
       "compositePrimaryKeys": {},
@@ -250,8 +250,8 @@
       "uniqueConstraints": {
         "students_grade_class_number_unique": {
           "name": "students_grade_class_number_unique",
-          "nullsNotDistinct": false,
-          "columns": ["grade", "class", "attendance_number"]
+          "columns": ["grade", "class", "attendance_number"],
+          "nullsNotDistinct": false
         }
       },
       "policies": {},
@@ -318,12 +318,6 @@
           "notNull": true,
           "default": false
         },
-        "request_id": {
-          "name": "request_id",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": false
-        },
         "voted_at": {
           "name": "voted_at",
           "type": "timestamp with time zone",
@@ -332,40 +326,24 @@
           "default": "now()"
         }
       },
-      "indexes": {
-        "votes_request_id_unique": {
-          "name": "votes_request_id_unique",
-          "columns": [
-            {
-              "expression": "request_id",
-              "isExpression": false,
-              "asc": true,
-              "nulls": "last"
-            }
-          ],
-          "isUnique": true,
-          "concurrently": false,
-          "method": "btree",
-          "with": {}
-        }
-      },
+      "indexes": {},
       "foreignKeys": {
         "votes_student_id_students_id_fk": {
           "name": "votes_student_id_students_id_fk",
           "tableFrom": "votes",
-          "tableTo": "students",
           "columnsFrom": ["student_id"],
+          "tableTo": "students",
           "columnsTo": ["id"],
-          "onDelete": "no action",
-          "onUpdate": "no action"
+          "onUpdate": "no action",
+          "onDelete": "no action"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
         "votes_student_grade_unique": {
           "name": "votes_student_grade_unique",
-          "nullsNotDistinct": false,
-          "columns": ["student_id", "grade"]
+          "columns": ["student_id", "grade"],
+          "nullsNotDistinct": false
         }
       },
       "policies": {},
@@ -417,10 +395,10 @@
     }
   },
   "schemas": {},
+  "views": {},
   "sequences": {},
   "roles": {},
   "policies": {},
-  "views": {},
   "_meta": {
     "columns": {},
     "schemas": {},
