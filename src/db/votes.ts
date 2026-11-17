@@ -2,7 +2,7 @@ import "server-only";
 
 import { and, asc, count, desc, eq, isNull, sql } from "drizzle-orm";
 import { auditLogs, students, votes } from "@/db/schema";
-import { GRADES, isGrade, type ClassName } from "@/lib/class-name";
+import type { ClassName } from "@/lib/class-name";
 import { db, type Executor } from "@/lib/db";
 import { getAuditReason } from "@/lib/audit-reason";
 import type { VoteSubmission } from "@/lib/vote-validation";
@@ -155,20 +155,19 @@ export async function getVoteProgress(
   const roster = await executor
     .select({
       attendanceNumber: students.attendanceNumber,
-      grades: sql<
-        number[]
-      >`coalesce(array_agg(${votes.grade} order by ${votes.grade}) filter (where ${votes.id} is not null), '{}'::integer[])`,
+      voteId: votes.id,
     })
     .from(students)
-    .leftJoin(votes, eq(votes.studentId, students.id))
+    .leftJoin(
+      votes,
+      and(eq(votes.studentId, students.id), eq(votes.grade, students.grade)),
+    )
     .where(and(eq(students.classname, classname), eq(students.part, part)))
-    .groupBy(students.id)
     .orderBy(asc(students.attendanceNumber));
 
-  const entries = roster.map(({ attendanceNumber, grades }) => ({
+  const entries = roster.map(({ attendanceNumber, voteId }) => ({
     attendanceNumber,
-    grades: grades.filter(isGrade),
-    voted: GRADES.every((grade) => grades.includes(grade)),
+    voted: voteId !== null,
   }));
   return {
     registeredCount: entries.length,
@@ -235,46 +234,25 @@ export async function registerVote(
         .from(votes)
         .where(eq(votes.studentId, student.id));
 
-      const [first] = submission.choices;
+      const [choice] = submission.choices;
       const previousRequest = existing.find(
         (vote) => vote.requestId === submission.requestId,
       );
       if (previousRequest) {
-        return previousRequest.grade === first.grade &&
-          submission.choices.every((choice) =>
-            existing.some(
-              (vote) =>
-                vote.grade === choice.grade &&
-                vote.firstClass === choice.firstClass &&
-                vote.secondClass === choice.secondClass,
-            ),
-          )
+        return previousRequest.grade === choice.grade &&
+          previousRequest.firstClass === choice.firstClass &&
+          previousRequest.secondClass === choice.secondClass
           ? "replayed"
           : "idempotency-conflict";
       }
-
-      const missing = GRADES.filter(
-        (grade) => !existing.some((vote) => vote.grade === grade),
-      );
-      if (
-        !missing.length ||
-        missing.length !== submission.choices.length ||
-        missing.some(
-          (grade) =>
-            !submission.choices.some((choice) => choice.grade === grade),
-        )
-      ) {
+      if (existing.some((vote) => vote.grade === choice.grade))
         return "already-voted";
-      }
 
-      // Only one row carries the batch ID because request_id is unique.
-      await tx.insert(votes).values(
-        submission.choices.map((choice) => ({
-          ...choice,
-          studentId: student.id,
-          requestId: choice === first ? submission.requestId : null,
-        })),
-      );
+      await tx.insert(votes).values({
+        ...choice,
+        studentId: student.id,
+        requestId: submission.requestId,
+      });
       return "created";
     });
   } catch (error) {

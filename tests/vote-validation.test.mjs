@@ -21,23 +21,17 @@ const input = {
   className: "A",
   part: "Soprano",
   attendanceNumber: 1,
-  choices: [
-    { grade: 1, firstClass: "B", secondClass: "C" },
-    { grade: 2, firstClass: "A", secondClass: "D" },
-    { grade: 3, firstClass: "C", secondClass: "B" },
-  ],
+  choices: [{ grade: 1, firstClass: "B", secondClass: "C" }],
 };
 
-test("a first-year student can rank classes in all three grades", () => {
+test("a first-year student can rank classes in their own grade", () => {
   assert.deepEqual(parseVoteSubmission(input)?.choices, [
     { grade: 1, firstClass: "1B", secondClass: "1C" },
-    { grade: 2, firstClass: "2A", secondClass: "2D" },
-    { grade: 3, firstClass: "3C", secondClass: "3B" },
   ]);
 });
 
 test("rejects invalid identification, duplicate grades, and invalid rankings", () => {
-  const [first, second] = input.choices;
+  const [first] = input.choices;
   for (const overrides of [
     { attendanceNumber: 0 },
     { attendanceNumber: 41 },
@@ -46,9 +40,10 @@ test("rejects invalid identification, duplicate grades, and invalid rankings", (
     { requestId: "not-a-uuid" },
     { choices: [] },
     { choices: [first, first] },
-    { choices: [{ ...first, firstClass: "A" }, second] },
-    { choices: [{ ...first, secondClass: "B" }, second] },
-    { choices: [{ ...second, firstClass: "E" }] },
+    { choices: [{ ...first, grade: 2 }] },
+    { choices: [{ ...first, firstClass: "A" }] },
+    { choices: [{ ...first, secondClass: "B" }] },
+    { choices: [{ ...first, firstClass: "E" }] },
   ])
     assert.equal(parseVoteSubmission({ ...input, ...overrides }), null);
 });

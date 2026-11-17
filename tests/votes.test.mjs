@@ -43,21 +43,19 @@ function createDatabase({
         },
         leftJoin: () => ({
           where: () => ({
-            groupBy: () => ({
-              orderBy: async () => [
-                {
-                  attendanceNumber: 1,
-                  grades: savedVotes.map((vote) => vote.grade),
-                },
-                { attendanceNumber: 2, grades: [] },
-              ],
-            }),
+            orderBy: async () => [
+              {
+                attendanceNumber: 1,
+                voteId: savedVotes.some(({ grade }) => grade === 1) ? 1 : null,
+              },
+              { attendanceNumber: 2, voteId: null },
+            ],
           }),
         }),
       }),
     }),
     insert: () => ({
-      values: async (rows) => savedVotes.push(...rows),
+      values: async (row) => savedVotes.push(row),
     }),
   };
   return {
@@ -72,21 +70,14 @@ const submission = {
   classname: "1A",
   part: "Soprano",
   attendanceNumber: 1,
-  choices: [
-    { grade: 1, firstClass: "1B", secondClass: "1C" },
-    { grade: 2, firstClass: "2A", secondClass: "2C" },
-    { grade: 3, firstClass: "3B", secondClass: "3C" },
-  ],
+  choices: [{ grade: 1, firstClass: "1B", secondClass: "1C" }],
 };
 
-test("registers all grades, accepts a retry, and rejects a different ballot", async () => {
+test("registers one grade, accepts a retry, and rejects a different ballot", async () => {
   const { database, savedVotes } = createDatabase();
   assert.equal(await registerVote(submission, database), "created");
   assert.equal(await registerVote(submission, database), "replayed");
-  const choices = [
-    { ...submission.choices[0], firstClass: "1D" },
-    ...submission.choices.slice(1),
-  ];
+  const choices = [{ ...submission.choices[0], firstClass: "1D" }];
   assert.equal(
     await registerVote({ ...submission, choices }, database),
     "idempotency-conflict",
@@ -99,17 +90,16 @@ test("registers all grades, accepts a retry, and rejects a different ballot", as
     savedVotes.map(({ grade, requestId }) => [grade, requestId]),
     [
       [1, submission.requestId],
-      [2, null],
-      [3, null],
     ],
   );
 });
 
-test("only fills missing grades and counts a student once all grades are registered", async () => {
+test("votes for other grades do not block the rehearsal ballot", async () => {
   const existing = {
-    ...submission.choices[0],
+    grade: 2,
+    firstClass: "2A",
+    secondClass: "2B",
     requestId: null,
-    studentId: "student-1",
   };
   const { database, executor, savedVotes } = createDatabase({
     existingVotes: [existing],
@@ -118,24 +108,14 @@ test("only fills missing grades and counts a student once all grades are registe
     (await getVoteProgress("1A", "Soprano", executor)).votedCount,
     0,
   );
-  assert.equal(await registerVote(submission, database), "already-voted");
-  assert.equal(
-    await registerVote(
-      { ...submission, choices: submission.choices.slice(1, 2) },
-      database,
-    ),
-    "already-voted",
-  );
-  const remaining = { ...submission, choices: submission.choices.slice(1) };
-  assert.equal(await registerVote(remaining, database), "created");
-  assert.equal(await registerVote(remaining, database), "replayed");
+  assert.equal(await registerVote(submission, database), "created");
   assert.equal(savedVotes[0], existing);
   assert.deepEqual(await getVoteProgress("1A", "Soprano", executor), {
     registeredCount: 2,
     votedCount: 1,
     students: [
-      { attendanceNumber: 1, voted: true, grades: [1, 2, 3] },
-      { attendanceNumber: 2, voted: false, grades: [] },
+      { attendanceNumber: 1, voted: true },
+      { attendanceNumber: 2, voted: false },
     ],
   });
 });
