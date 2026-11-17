@@ -12,5 +12,6 @@ LICENSE
 Dockerfile
 .dockerignore
 docker-compose*.yml
-scripts
+scripts/*
 !scripts/build-changelog.mjs
+!scripts/create-member.mjs

@@ -100,9 +100,9 @@ export const votes = pgTable(
   "votes",
   {
     id: serial("id").primaryKey(),
-    studentId: varchar("student_id", { length: 32 })
-      .notNull()
-      .references(() => students.id),
+    studentId: varchar("student_id", { length: 32 }).references(
+      () => students.id,
+    ),
     grade: integer("grade").notNull(),
     firstClass: classEnum("first_class").notNull(),
     secondClass: classEnum("second_class").notNull(),
@@ -126,14 +126,23 @@ export const votes = pgTable(
 );
 
 // 委員の操作履歴を記録する。
-export const auditLogs = pgTable("audit_logs", {
-  id: serial("id").primaryKey(),
-  operatorName: text("operator_name").notNull(),
-  action: text("action").notNull(),
-  targetType: text("target_type"),
-  targetId: text("target_id"),
-  details: jsonb("details").$type<Record<string, unknown>>(),
-  createdAt: timestamp("created_at", { withTimezone: true })
-    .notNull()
-    .defaultNow(),
-});
+export const auditLogs = pgTable(
+  "audit_logs",
+  {
+    id: serial("id").primaryKey(),
+    operatorName: text("operator_name").notNull(),
+    action: text("action").notNull(),
+    targetType: text("target_type"),
+    targetId: text("target_id"),
+    details: jsonb("details").$type<Record<string, unknown>>(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    check(
+      "audit_logs_reason_required",
+      sql`${table.action} not in ('vote.create_manual', 'vote.delete', 'vote.invalidate', 'member.create', 'member.password_reset', 'member.permission_change', 'member.delete') or coalesce(jsonb_typeof(${table.details}->'reason') = 'string' and length(btrim(${table.details}->>'reason')) between 1 and 500, false)`,
+    ),
+  ],
+);

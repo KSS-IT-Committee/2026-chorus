@@ -39,6 +39,11 @@ RUN addgroup --system --gid 1001 nodejs && \
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/scripts/create-member.mjs ./scripts/create-member.mjs
+COPY --from=builder --chown=nextjs:nodejs /app/src/db/schema.ts ./src/db/schema.ts
+COPY --from=builder --chown=nextjs:nodejs /app/src/lib/password.ts /app/src/lib/account-validation.ts ./src/lib/
+COPY --from=deps --chown=nextjs:nodejs /app/node_modules/postgres ./node_modules/postgres
+COPY --from=deps --chown=nextjs:nodejs /app/node_modules/drizzle-orm ./node_modules/drizzle-orm
 # Create the files dir owned by the app user so the image is also writable when
 # run without the bind mount.
 RUN mkdir -p /app/files && chown nextjs:nodejs /app/files

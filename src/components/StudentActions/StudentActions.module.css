@@ -1,0 +1,32 @@
+.edit {
+  display: inline-grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  color: var(--theme-text);
+  background: transparent;
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.edit:hover {
+  background: var(--theme-surface-soft);
+}
+
+.edit:focus-visible {
+  outline: 3px solid var(--theme-focus);
+  outline-offset: -3px;
+}
+
+.delete {
+  margin-right: auto;
+  color: var(--theme-error);
+  background: transparent;
+}
+
+.danger {
+  color: #fff;
+  background: #a12323;
+}

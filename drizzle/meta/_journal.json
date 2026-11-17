@@ -29,6 +29,27 @@
       "when": 1794664357183,
       "tag": "0003_add_vote_invalid",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1794724257767,
+      "tag": "0004_sync_student_part",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1794733717130,
+      "tag": "0005_allow_manual_votes",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1794734924602,
+      "tag": "0006_require_audit_reason",
+      "breakpoints": true
     }
   ]
 }
