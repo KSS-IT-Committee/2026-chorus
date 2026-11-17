@@ -8,8 +8,7 @@ const LINKS = [
   {
     href: "/vote-rehearsal",
     title: "リハーサル投票",
-    description:
-      "リハーサル当日に使う投票ページです。投票コードは合唱委員から伝えられます。",
+    description: "リハーサル当日に使う投票ページです。",
   },
 ] as const;
 

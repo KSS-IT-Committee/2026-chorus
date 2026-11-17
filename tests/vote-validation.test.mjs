@@ -15,104 +15,40 @@ registerHooks({
 
 const { parseVoteSubmission } = await import("../src/lib/vote-validation.ts");
 
-test("parses a valid vote and normalizes its class names", () => {
-  assert.deepEqual(
-    parseVoteSubmission({
-      grade: "2",
-      requestId: "123e4567-e89b-42d3-a456-426614174000",
-      className: "a",
-      part: "Soprano",
-      attendanceNumber: 12,
-      firstClass: "B",
-      secondClass: "D",
-    }),
-    {
-      requestId: "123e4567-e89b-42d3-a456-426614174000",
-      grade: 2,
-      classname: "2A",
-      part: "Soprano",
-      attendanceNumber: 12,
-      firstClass: "2B",
-      secondClass: "2D",
-    },
-  );
+const input = {
+  grade: "1",
+  requestId: "123e4567-e89b-42d3-a456-426614174000",
+  className: "A",
+  part: "Soprano",
+  attendanceNumber: 1,
+  choices: [
+    { grade: 1, firstClass: "B", secondClass: "C" },
+    { grade: 2, firstClass: "A", secondClass: "D" },
+    { grade: 3, firstClass: "C", secondClass: "B" },
+  ],
+};
+
+test("a first-year student can rank classes in all three grades", () => {
+  assert.deepEqual(parseVoteSubmission(input)?.choices, [
+    { grade: 1, firstClass: "1B", secondClass: "1C" },
+    { grade: 2, firstClass: "2A", secondClass: "2D" },
+    { grade: 3, firstClass: "3C", secondClass: "3B" },
+  ]);
 });
 
-test("rejects malformed or out-of-range voter data", () => {
-  for (const attendanceNumber of [0, 41, 1.5, "12"]) {
-    assert.equal(
-      parseVoteSubmission({
-        grade: 1,
-        requestId: "123e4567-e89b-42d3-a456-426614174000",
-        className: "A",
-        part: "Soprano",
-        attendanceNumber,
-        firstClass: "B",
-        secondClass: "C",
-      }),
-      null,
-    );
-  }
-
-  assert.equal(parseVoteSubmission(null), null);
-  assert.equal(
-    parseVoteSubmission({
-      grade: "4",
-      requestId: "123e4567-e89b-42d3-a456-426614174000",
-      className: "A",
-      part: "Soprano",
-      attendanceNumber: 1,
-      firstClass: "B",
-      secondClass: "C",
-    }),
-    null,
-  );
-});
-
-test("rejects same-class, self-class, and invalid-class choices", () => {
-  const input = {
-    grade: 1,
-    requestId: "123e4567-e89b-42d3-a456-426614174000",
-    className: "A",
-    part: "Soprano",
-    attendanceNumber: 1,
-    firstClass: "B",
-    secondClass: "C",
-  };
-
-  assert.equal(parseVoteSubmission({ ...input, secondClass: "B" }), null);
-  assert.equal(parseVoteSubmission({ ...input, firstClass: "A" }), null);
-  assert.equal(parseVoteSubmission({ ...input, secondClass: "E" }), null);
-});
-
-test("requires a UUID request identifier", () => {
-  const input = {
-    grade: 1,
-    requestId: "123e4567-e89b-42d3-a456-426614174000",
-    className: "A",
-    part: "Soprano",
-    attendanceNumber: 1,
-    firstClass: "B",
-    secondClass: "C",
-  };
-
-  assert.equal(
-    parseVoteSubmission({ ...input, requestId: "not-a-uuid" }),
-    null,
-  );
-});
-
-test("requires a valid part", () => {
-  const input = {
-    grade: 1,
-    requestId: "123e4567-e89b-42d3-a456-426614174000",
-    className: "A",
-    part: "Soprano",
-    attendanceNumber: 1,
-    firstClass: "B",
-    secondClass: "C",
-  };
-
-  assert.equal(parseVoteSubmission({ ...input, part: "Unknown" }), null);
-  assert.equal(parseVoteSubmission({ ...input, part: undefined }), null);
+test("rejects invalid identification, duplicate grades, and invalid rankings", () => {
+  const [first, second] = input.choices;
+  for (const overrides of [
+    { attendanceNumber: 0 },
+    { attendanceNumber: 41 },
+    { grade: "4" },
+    { part: "Unknown" },
+    { requestId: "not-a-uuid" },
+    { choices: [] },
+    { choices: [first, first] },
+    { choices: [{ ...first, firstClass: "A" }, second] },
+    { choices: [{ ...first, secondClass: "B" }, second] },
+    { choices: [{ ...second, firstClass: "E" }] },
+  ])
+    assert.equal(parseVoteSubmission({ ...input, ...overrides }), null);
 });

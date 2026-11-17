@@ -2,10 +2,8 @@ import { useEffect, useRef, type KeyboardEvent } from "react";
 import styles from "./index.module.css";
 
 type VoteConfirmationProps = {
-  grade: string;
   attendanceNumber: number;
-  targetClass: string;
-  secondTargetClass: string;
+  choices: { grade: number; firstClass: string; secondClass: string }[];
   error: string | null;
   isSubmitting: boolean;
   onCancel: () => void;
@@ -13,10 +11,8 @@ type VoteConfirmationProps = {
 };
 
 export default function VoteConfirmation({
-  grade,
   attendanceNumber,
-  targetClass,
-  secondTargetClass,
+  choices,
   error,
   isSubmitting,
   onCancel,
@@ -74,7 +70,6 @@ export default function VoteConfirmation({
         aria-describedby="confirm-description"
         onKeyDown={handleDialogKeyDown}
       >
-        <p className={styles.eyebrow}>最終確認</p>
         <h2 id="confirm-title" className={styles.title}>
           この内容で投票しますか？
         </h2>
@@ -86,18 +81,14 @@ export default function VoteConfirmation({
             <dt>出席番号:</dt>
             <dd>{attendanceNumber}番</dd>
           </div>
-          <div>
-            <dt>1番に投票したいクラス:</dt>
-            <dd>
-              {grade}年{targetClass}組
-            </dd>
-          </div>
-          <div>
-            <dt>2番に投票したいクラス:</dt>
-            <dd>
-              {grade}年{secondTargetClass}組
-            </dd>
-          </div>
+          {choices.map(({ grade, firstClass, secondClass }) => (
+            <div key={grade}>
+              <dt>{grade}年</dt>
+              <dd>
+                第1希望 {firstClass}組・第2希望 {secondClass}組
+              </dd>
+            </div>
+          ))}
         </dl>
         {error && (
           <p className={styles.error} role="alert">

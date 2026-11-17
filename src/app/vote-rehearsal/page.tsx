@@ -2,6 +2,7 @@
 
 import {
   Suspense,
+  startTransition,
   useEffect,
   useMemo,
   useState,
@@ -16,6 +17,8 @@ import StepHeading from "@/components/StepHeading";
 import VoteConfirmation from "@/components/VoteConfirmation";
 import VoteProgressBar from "@/components/VoteProgressBar";
 import styles from "./page.module.css";
+import { submitRehearsalVote } from "./actions";
+import { GRADES } from "@/lib/class-name";
 
 const grades = ["1", "2", "3"] as const;
 const classes = ["A", "B", "C", "D"] as const;
@@ -42,13 +45,13 @@ type VoteProgressResponse = {
   students: {
     attendanceNumber: number;
     voted: boolean;
+    grades: number[];
   }[];
 };
 type Vote = {
   requestId: string;
   attendanceNumber: number;
-  targetClass: ClassName;
-  secondTargetClass: ClassName;
+  choices: { grade: number; firstClass: ClassName; secondClass: ClassName }[];
 };
 
 function isVoteProgress(value: unknown): value is VoteProgressResponse {
@@ -76,7 +79,9 @@ function isVoteProgress(value: unknown): value is VoteProgressResponse {
         typeof student.attendanceNumber === "number" &&
         Number.isInteger(student.attendanceNumber) &&
         "voted" in student &&
-        typeof student.voted === "boolean",
+        typeof student.voted === "boolean" &&
+        "grades" in student &&
+        Array.isArray(student.grades),
     )
   );
 }
@@ -122,12 +127,18 @@ function VoteRehearsalContent() {
       : "setup",
   ); // 投票状態管理
   const [attendanceNumber, setAttendanceNumber] = useState(""); // 出席番号
-  const [targetClass, setTargetClass] = useState<ClassName | "">(""); // 1番目の投票先
-  const [secondTargetClass, setSecondTargetClass] = useState<ClassName | "">(
-    "",
-  ); // 2番目の投票先
+  const [choices, setChoices] = useState<
+    Partial<
+      Record<
+        number,
+        {
+          firstClass: ClassName | "";
+          secondClass: ClassName | "";
+        }
+      >
+    >
+  >({});
   const [pendingVote, setPendingVote] = useState<Vote | null>(null); // 投票内容の一時保存
-  const [votedCount, setVotedCount] = useState(0);
   const [rosterProgress, setRosterProgress] = useState<
     (VoteProgressResponse & VoteGroup) | null
   >(null);
@@ -157,7 +168,6 @@ function VoteRehearsalContent() {
 
         setRosterProgress({ ...result, ...group });
         setRosterError(null);
-        setVotedCount(result.votedCount);
       } catch {
         if (!controller.signal.aborted) {
           setRosterError({
@@ -183,6 +193,7 @@ function VoteRehearsalContent() {
     rosterProgress.part === part
       ? rosterProgress
       : null;
+  const votedCount = currentRoster?.votedCount ?? 0;
   const hasCurrentRoster = currentRoster !== null;
   const currentRosterError =
     rosterError?.grade === grade &&
@@ -262,15 +273,6 @@ function VoteRehearsalContent() {
     value: item,
     label: `${item}組`,
   }));
-  const targetClassOptions = classes
-    .filter((item) => item !== className)
-    .map((item) => ({
-      value: item,
-      label: `${grade}年${item}組`,
-    }));
-  const secondTargetClassOptions = targetClassOptions.filter(
-    (item) => item.value !== targetClass,
-  );
   const attendanceNumberOptions =
     currentRoster?.students
       .filter(
@@ -286,6 +288,23 @@ function VoteRehearsalContent() {
     (option) => option.value === attendanceNumber,
   );
 
+  const selectedStudent = currentRoster?.students.find(
+    (student) => String(student.attendanceNumber) === attendanceNumber,
+  );
+  const missingGrades = GRADES.filter(
+    (grade) => !selectedStudent?.grades.includes(grade),
+  );
+  const validChoices =
+    missingGrades.length > 0 &&
+    missingGrades.every((grade) => {
+      const choice = choices[grade];
+      return (
+        choice?.firstClass &&
+        choice.secondClass &&
+        choice.firstClass !== choice.secondClass
+      );
+    });
+
   function startVoting(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!canStart) return;
@@ -298,100 +317,63 @@ function VoteRehearsalContent() {
   ) {
     setter(value);
     setAbsentAttendanceNumbers([]);
+    setAttendanceNumber("");
+    setChoices({});
     setStep("setup");
   }
 
   function submitVote(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (
-      !validAttendanceNumber ||
-      !targetClass ||
-      !secondTargetClass ||
-      targetClass === secondTargetClass
-    ) {
-      return;
-    }
+    if (!validAttendanceNumber || !validChoices) return;
 
     setPendingVote({
       requestId: crypto.randomUUID(),
       attendanceNumber: Number(attendanceNumber),
-      targetClass,
-      secondTargetClass,
+      choices: missingGrades.flatMap((grade) => {
+        const choice = choices[grade];
+        return choice?.firstClass && choice.secondClass
+          ? [
+              {
+                grade,
+                firstClass: choice.firstClass,
+                secondClass: choice.secondClass,
+              },
+            ]
+          : [];
+      }),
     });
     setVoteError(null);
   }
 
-  async function confirmVote() {
+  function confirmVote() {
     if (!pendingVote || !grade || !className || !part || isSubmitting) return;
 
     setIsSubmitting(true);
     setVoteError(null);
-    try {
-      const response = await fetch("/api/votes", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          requestId: pendingVote.requestId,
+    startTransition(async () => {
+      try {
+        const result = await submitRehearsalVote({
+          ...pendingVote,
           grade,
           className,
           part,
-          attendanceNumber: pendingVote.attendanceNumber,
-          firstClass: pendingVote.targetClass,
-          secondClass: pendingVote.secondTargetClass,
-        }),
-      });
-      const result: unknown = await response.json().catch(() => null);
-      if (!response.ok) {
-        const errorCode =
-          typeof result === "object" &&
-          result !== null &&
-          "error" in result &&
-          typeof result.error === "string"
-            ? result.error
-            : "";
-        setVoteError(
-          errorCode === "STUDENT_NOT_FOUND"
-            ? "この学年・クラス・パートに該当する出席番号は名簿に見つかりません。入力内容を確認してください。"
-            : errorCode === "ALREADY_VOTED"
-              ? "この生徒の投票はすでに登録されています。委員に確認してください。"
-              : errorCode === "INVALID_VOTE"
-                ? "投票内容を確認してください。"
-                : errorCode === "IDEMPOTENCY_CONFLICT"
-                  ? "送信IDと投票内容が一致しません。最初からやり直してください。"
-                  : "投票を保存できませんでした。時間をおいて再度お試しください。",
-        );
-        return;
+        });
+        if (result.progress) {
+          setRosterProgress({ ...result.progress, grade, className, part });
+        }
+        if (result.error) {
+          setVoteError(result.error);
+          return;
+        }
+        setAttendanceNumber("");
+        setChoices({});
+        setPendingVote(null);
+      } catch {
+        setVoteError("通信に失敗しました。もう一度送信してください。");
+      } finally {
+        setIsSubmitting(false);
       }
-
-      const updatedVotedCount = votedCount + 1;
-      setVotedCount(updatedVotedCount);
-      setRosterProgress((current) =>
-        current
-          ? {
-              ...current,
-              votedCount: updatedVotedCount,
-              absentCount: current.registeredCount - updatedVotedCount,
-              students: current.students.map((student) =>
-                student.attendanceNumber === pendingVote.attendanceNumber
-                  ? { ...student, voted: true }
-                  : student,
-              ),
-            }
-          : current,
-      );
-      setAttendanceNumber("");
-      setTargetClass("");
-      setSecondTargetClass("");
-      setPendingVote(null);
-
-      if (updatedVotedCount >= count) {
-        setStep("finished");
-      }
-    } catch {
-      setVoteError("通信に失敗しました。接続を確認して再度お試しください。");
-    } finally {
-      setIsSubmitting(false);
-    }
+    });
   }
 
   return (
@@ -524,7 +506,7 @@ function VoteRehearsalContent() {
                       ? rosterProgress.registeredCount - count
                       : 0}
                     人・未投票
-                    {rosterProgress?.absentCount ?? 0}人
+                    {Math.max(count - votedCount, 0)}人
                   </span>
                 </div>
 
@@ -538,29 +520,64 @@ function VoteRehearsalContent() {
                     value={attendanceNumber}
                     options={attendanceNumberOptions}
                     placeholder="出席番号を選択してください"
-                    onChange={setAttendanceNumber}
-                  />
-
-                  <PullDown
-                    label="1番投票したいクラス"
-                    value={targetClass}
-                    options={targetClassOptions}
-                    placeholder="クラスを選択してください"
                     onChange={(value) => {
-                      setTargetClass(value);
-                      if (value === secondTargetClass) {
-                        setSecondTargetClass("");
-                      }
+                      setAttendanceNumber(value);
+                      setChoices({});
                     }}
                   />
 
-                  <PullDown
-                    label="2番目に投票したいクラス"
-                    value={secondTargetClass}
-                    options={secondTargetClassOptions}
-                    placeholder="クラスを選択してください"
-                    onChange={setSecondTargetClass}
-                  />
+                  {selectedStudent &&
+                    GRADES.map((targetGrade) => {
+                      const choice = choices[targetGrade];
+                      const options = classOptions.filter(
+                        ({ value }) =>
+                          Number(grade) !== targetGrade || value !== className,
+                      );
+                      return (
+                        <fieldset className={styles.ballot} key={targetGrade}>
+                          <legend>{targetGrade}年</legend>
+                          {selectedStudent.grades.includes(targetGrade) ? (
+                            <p>登録済み</p>
+                          ) : (
+                            <div className={styles.ballotFields}>
+                              <PullDown
+                                label="第1希望"
+                                value={choice?.firstClass ?? ""}
+                                options={options}
+                                onChange={(firstClass) =>
+                                  setChoices((current) => ({
+                                    ...current,
+                                    [targetGrade]: {
+                                      firstClass,
+                                      secondClass:
+                                        firstClass === choice?.secondClass
+                                          ? ""
+                                          : (choice?.secondClass ?? ""),
+                                    },
+                                  }))
+                                }
+                              />
+                              <PullDown
+                                label="第2希望"
+                                value={choice?.secondClass ?? ""}
+                                options={options.filter(
+                                  ({ value }) => value !== choice?.firstClass,
+                                )}
+                                onChange={(secondClass) =>
+                                  setChoices((current) => ({
+                                    ...current,
+                                    [targetGrade]: {
+                                      firstClass: choice?.firstClass ?? "",
+                                      secondClass,
+                                    },
+                                  }))
+                                }
+                              />
+                            </div>
+                          )}
+                        </fieldset>
+                      );
+                    })}
 
                   <InformationNote variant="warning">
                     この投票は取り消せません。
@@ -576,9 +593,7 @@ function VoteRehearsalContent() {
                       isLoadingRoster ||
                       Boolean(currentRosterError) ||
                       !validAttendanceNumber ||
-                      !targetClass ||
-                      !secondTargetClass ||
-                      targetClass === secondTargetClass
+                      !validChoices
                     }
                   >
                     この内容で投票する
@@ -612,10 +627,8 @@ function VoteRehearsalContent() {
       </div>
       {pendingVote && grade && (
         <VoteConfirmation
-          grade={grade}
           attendanceNumber={pendingVote.attendanceNumber}
-          targetClass={pendingVote.targetClass}
-          secondTargetClass={pendingVote.secondTargetClass}
+          choices={pendingVote.choices}
           error={voteError}
           isSubmitting={isSubmitting}
           onCancel={() => {

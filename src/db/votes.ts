@@ -2,7 +2,7 @@ import "server-only";
 
 import { and, asc, count, desc, eq, isNull, sql } from "drizzle-orm";
 import { auditLogs, students, votes } from "@/db/schema";
-import type { ClassName } from "@/lib/class-name";
+import { GRADES, isGrade, type ClassName } from "@/lib/class-name";
 import { db, type Executor } from "@/lib/db";
 import { getAuditReason } from "@/lib/audit-reason";
 import type { VoteSubmission } from "@/lib/vote-validation";
@@ -147,41 +147,33 @@ export type RegisterVoteResult =
   | "already-voted"
   | "idempotency-conflict";
 
-export type VoteProgress = {
-  registeredCount: number;
-  votedCount: number;
-  students: {
-    attendanceNumber: number;
-    voted: boolean;
-  }[];
-};
-
 export async function getVoteProgress(
-  classname: VoteSubmission["classname"],
+  classname: ClassName,
   part: VoteSubmission["part"],
-  grade: number,
   executor: Executor = db,
-): Promise<VoteProgress> {
+) {
   const roster = await executor
     .select({
       attendanceNumber: students.attendanceNumber,
-      voteId: votes.id,
+      grades: sql<
+        number[]
+      >`coalesce(array_agg(${votes.grade} order by ${votes.grade}) filter (where ${votes.id} is not null), '{}'::integer[])`,
     })
     .from(students)
-    .leftJoin(
-      votes,
-      and(eq(votes.studentId, students.id), eq(votes.grade, grade)),
-    )
+    .leftJoin(votes, eq(votes.studentId, students.id))
     .where(and(eq(students.classname, classname), eq(students.part, part)))
+    .groupBy(students.id)
     .orderBy(asc(students.attendanceNumber));
 
+  const entries = roster.map(({ attendanceNumber, grades }) => ({
+    attendanceNumber,
+    grades: grades.filter(isGrade),
+    voted: GRADES.every((grade) => grades.includes(grade)),
+  }));
   return {
-    registeredCount: roster.length,
-    votedCount: roster.filter((student) => student.voteId !== null).length,
-    students: roster.map((student) => ({
-      attendanceNumber: student.attendanceNumber,
-      voted: student.voteId !== null,
-    })),
+    registeredCount: entries.length,
+    votedCount: entries.filter((student) => student.voted).length,
+    students: entries,
   };
 }
 
@@ -214,63 +206,81 @@ function getDuplicateConstraint(error: unknown): string | undefined {
 
 export async function registerVote(
   submission: VoteSubmission,
-  executor: Executor = db,
+  database: Pick<typeof db, "transaction"> = db,
 ): Promise<RegisterVoteResult> {
-  const [student] = await executor
-    .select({ id: students.id })
-    .from(students)
-    .where(
-      and(
-        eq(students.classname, submission.classname),
-        eq(students.part, submission.part),
-        eq(students.attendanceNumber, submission.attendanceNumber),
-      ),
-    )
-    .limit(1);
-
-  if (!student) return "student-not-found";
-
-  const vote = {
-    studentId: student.id,
-    grade: submission.grade,
-    firstClass: submission.firstClass,
-    secondClass: submission.secondClass,
-    requestId: submission.requestId,
-  };
-
   try {
-    await executor.insert(votes).values(vote);
-  } catch (error) {
-    const constraint = getDuplicateConstraint(error);
-    if (
-      constraint === "votes_student_grade_unique" ||
-      constraint === "votes_request_id_unique"
-    ) {
-      const [existingRequest] = await executor
+    return await database.transaction(async (tx) => {
+      const [student] = await tx
+        .select({ id: students.id })
+        .from(students)
+        .where(
+          and(
+            eq(students.classname, submission.classname),
+            eq(students.part, submission.part),
+            eq(students.attendanceNumber, submission.attendanceNumber),
+          ),
+        )
+        .limit(1)
+        .for("update");
+
+      if (!student) return "student-not-found";
+
+      const existing = await tx
         .select({
-          studentId: votes.studentId,
           grade: votes.grade,
           firstClass: votes.firstClass,
           secondClass: votes.secondClass,
+          requestId: votes.requestId,
         })
         .from(votes)
-        .where(eq(votes.requestId, submission.requestId))
-        .limit(1);
+        .where(eq(votes.studentId, student.id));
 
-      if (existingRequest) {
-        return existingRequest.studentId === student.id &&
-          existingRequest.grade === submission.grade &&
-          existingRequest.firstClass === submission.firstClass &&
-          existingRequest.secondClass === submission.secondClass
+      const [first] = submission.choices;
+      const previousRequest = existing.find(
+        (vote) => vote.requestId === submission.requestId,
+      );
+      if (previousRequest) {
+        return previousRequest.grade === first.grade &&
+          submission.choices.every((choice) =>
+            existing.some(
+              (vote) =>
+                vote.grade === choice.grade &&
+                vote.firstClass === choice.firstClass &&
+                vote.secondClass === choice.secondClass,
+            ),
+          )
           ? "replayed"
           : "idempotency-conflict";
       }
 
-      if (constraint === "votes_student_grade_unique") return "already-voted";
-    }
+      const missing = GRADES.filter(
+        (grade) => !existing.some((vote) => vote.grade === grade),
+      );
+      if (
+        !missing.length ||
+        missing.length !== submission.choices.length ||
+        missing.some(
+          (grade) =>
+            !submission.choices.some((choice) => choice.grade === grade),
+        )
+      ) {
+        return "already-voted";
+      }
 
+      // Only one row carries the batch ID because request_id is unique.
+      await tx.insert(votes).values(
+        submission.choices.map((choice) => ({
+          ...choice,
+          studentId: student.id,
+          requestId: choice === first ? submission.requestId : null,
+        })),
+      );
+      return "created";
+    });
+  } catch (error) {
+    const constraint = getDuplicateConstraint(error);
+    if (constraint === "votes_request_id_unique") return "idempotency-conflict";
+    if (constraint === "votes_student_grade_unique") return "already-voted";
     throw error;
   }
-
-  return "created";
 }
