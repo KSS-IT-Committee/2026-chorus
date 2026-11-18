@@ -4,6 +4,7 @@
   inset: 0;
   display: grid;
   place-items: center;
+  grid-template-rows: minmax(0, 1fr);
   padding: 24px;
   background: rgba(15, 20, 45, 0.62);
   backdrop-filter: blur(5px);
@@ -11,19 +12,13 @@
 
 .dialog {
   width: min(100%, 700px);
+  max-block-size: 100%;
+  overflow: auto;
   padding: 36px;
   border: 2px solid var(--theme-border);
   border-radius: 18px;
   background: var(--theme-surface);
   box-shadow: 0 24px 80px rgba(8, 12, 34, 0.35);
-}
-
-.eyebrow {
-  margin-bottom: 12px;
-  color: var(--theme-strong);
-  font-size: 15px;
-  font-weight: 700;
-  letter-spacing: 0.14em;
 }
 
 .title {
@@ -68,6 +63,13 @@
   text-align: left;
 }
 
+.error {
+  margin-top: 20px;
+  color: var(--theme-error);
+  font-weight: 700;
+  line-height: 1.6;
+}
+
 .actions {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -92,7 +94,7 @@
 
 .cancel {
   background: var(--theme-surface);
-  color: var(--theme-accent);
+  color: var(--theme-text);
 }
 
 .confirm {
@@ -104,6 +106,13 @@
 .cancel:hover,
 .confirm:hover {
   transform: translateY(-1px);
+}
+
+.cancel:disabled,
+.confirm:disabled {
+  cursor: wait;
+  opacity: 0.7;
+  transform: none;
 }
 
 .cancel:hover {

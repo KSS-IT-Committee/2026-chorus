@@ -69,8 +69,8 @@
 }
 
 .selectWrap select:focus {
-  border-color: var(--theme-accent);
-  box-shadow: 0 0 0 3px rgba(86, 101, 165, 0.16);
+  outline: 2px solid var(--theme-focus);
+  outline-offset: 2px;
 }
 
 @media (prefers-reduced-motion: reduce) {

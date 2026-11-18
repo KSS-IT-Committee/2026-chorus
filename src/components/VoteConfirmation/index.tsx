@@ -2,19 +2,19 @@ import { useEffect, useRef, type KeyboardEvent } from "react";
 import styles from "./index.module.css";
 
 type VoteConfirmationProps = {
-  grade: string;
   attendanceNumber: number;
-  targetClass: string;
-  secondTargetClass: string;
+  choices: { grade: number; firstClass: string; secondClass: string }[];
+  error: string | null;
+  isSubmitting: boolean;
   onCancel: () => void;
-  onConfirm: () => void;
+  onConfirm: () => void | Promise<void>;
 };
 
 export default function VoteConfirmation({
-  grade,
   attendanceNumber,
-  targetClass,
-  secondTargetClass,
+  choices,
+  error,
+  isSubmitting,
   onCancel,
   onConfirm,
 }: VoteConfirmationProps) {
@@ -37,7 +37,7 @@ export default function VoteConfirmation({
   function handleDialogKeyDown(event: KeyboardEvent<HTMLElement>) {
     if (event.key === "Escape") {
       event.preventDefault();
-      onCancel();
+      if (!isSubmitting) onCancel();
       return;
     }
 
@@ -70,7 +70,6 @@ export default function VoteConfirmation({
         aria-describedby="confirm-description"
         onKeyDown={handleDialogKeyDown}
       >
-        <p className={styles.eyebrow}>最終確認</p>
         <h2 id="confirm-title" className={styles.title}>
           この内容で投票しますか？
         </h2>
@@ -82,30 +81,37 @@ export default function VoteConfirmation({
             <dt>出席番号:</dt>
             <dd>{attendanceNumber}番</dd>
           </div>
-          <div>
-            <dt>1番に投票したいクラス:</dt>
-            <dd>
-              {grade}年{targetClass}組
-            </dd>
-          </div>
-          <div>
-            <dt>2番に投票したいクラス:</dt>
-            <dd>
-              {grade}年{secondTargetClass}組
-            </dd>
-          </div>
+          {choices.map(({ grade, firstClass, secondClass }) => (
+            <div key={grade}>
+              <dt>{grade}年</dt>
+              <dd>
+                第1希望 {firstClass}組・第2希望 {secondClass}組
+              </dd>
+            </div>
+          ))}
         </dl>
+        {error && (
+          <p className={styles.error} role="alert">
+            {error}
+          </p>
+        )}
         <div className={styles.actions}>
           <button
             className={styles.cancel}
             type="button"
             ref={cancelButtonRef}
+            disabled={isSubmitting}
             onClick={onCancel}
           >
             戻って修正する
           </button>
-          <button className={styles.confirm} type="button" onClick={onConfirm}>
-            投票を確定する
+          <button
+            className={styles.confirm}
+            type="button"
+            disabled={isSubmitting}
+            onClick={onConfirm}
+          >
+            {isSubmitting ? "送信中…" : "投票を確定する"}
           </button>
         </div>
       </section>

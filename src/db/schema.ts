@@ -11,6 +11,8 @@ import {
   text,
   timestamp,
   unique,
+  uniqueIndex,
+  uuid,
   varchar,
 } from "drizzle-orm/pg-core";
 
@@ -107,12 +109,14 @@ export const votes = pgTable(
     firstClass: classEnum("first_class").notNull(),
     secondClass: classEnum("second_class").notNull(),
     invalid: boolean("invalid").notNull().default(false),
+    requestId: uuid("request_id"),
     votedAt: timestamp("voted_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
   },
   (table) => [
     unique("votes_student_grade_unique").on(table.studentId, table.grade),
+    uniqueIndex("votes_request_id_unique").on(table.requestId),
     check("votes_grade_range", sql`${table.grade} between 1 and 3`),
     check(
       "votes_different_classes",
