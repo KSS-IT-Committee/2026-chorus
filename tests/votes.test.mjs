@@ -88,9 +88,7 @@ test("registers one grade, accepts a retry, and rejects a different ballot", asy
   );
   assert.deepEqual(
     savedVotes.map(({ grade, requestId }) => [grade, requestId]),
-    [
-      [1, submission.requestId],
-    ],
+    [[1, submission.requestId]],
   );
 });
 
