@@ -10,6 +10,11 @@ const LINKS = [
     title: "リハーサル投票",
     description: "リハーサル当日に使う投票ページです。",
   },
+  {
+    href: "/verify",
+    title: "生徒情報",
+    description: "登録されている生徒情報の確認ができます。ここに登録されていなかった場合、当日投票できません。委員にお問い合わせください。",
+  },
 ] as const;
 
 export default function Home() {

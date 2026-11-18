@@ -1,0 +1,121 @@
+.main {
+  flex: 1;
+  width: min(100%, 1200px);
+  margin: 0 auto;
+  padding: 72px 20px 96px;
+}
+
+.title {
+  font-size: 2rem;
+  padding: 0.5rem 0;
+}
+
+.pageList {
+  margin-top: 32px;
+  border: 1px solid var(--theme-border);
+  border-radius: 12px;
+  background: var(--theme-surface);
+}
+
+.pageListItem + .pageListItem {
+  border-top: 1px solid var(--theme-border);
+}
+
+.pageLink {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 52px;
+  padding: 14px 20px;
+  color: var(--theme-text);
+  font-weight: 700;
+  border-radius: 15px;
+  transition: background 0.2s ease-in-out;
+}
+
+.pageLink::after {
+  content: "→";
+  margin-left: 16px;
+}
+
+.pageLink:hover {
+  background: var(--theme-surface-soft);
+}
+
+.pageLink:focus-visible {
+  outline: 3px solid var(--theme-focus);
+  outline-offset: -3px;
+}
+
+.selectContainer {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+  gap: 20px;
+  max-width: 520px;
+  margin-top: 32px;
+}
+
+.button {
+  align-self: end;
+  min-height: 56px;
+  padding: 0 24px;
+  border: 0;
+  border-radius: 8px;
+  background: var(--theme-accent);
+  color: var(--theme-button-text);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.button:hover {
+  background: var(--theme-accent-hover);
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--theme-focus);
+  outline-offset: 2px;
+}
+
+.results {
+  margin-top: 40px;
+}
+
+.results > p {
+  margin-top: 16px;
+}
+
+.parts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.part {
+  padding: 20px;
+  border: 1px solid var(--theme-border);
+  border-radius: 8px;
+  background: var(--theme-surface);
+  color: var(--theme-text);
+}
+
+.part ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  margin-top: 12px;
+  list-style: none;
+}
+
+.part p {
+  margin-top: 12px;
+}
+
+@media (prefers-color-scheme: dark) {
+  .main {
+    --theme-input-surface: var(--NAVY_B);
+    --theme-input-text: var(--theme-text);
+    color-scheme: dark;
+  }
+}
