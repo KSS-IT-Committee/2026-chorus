@@ -43,7 +43,9 @@ export default async function VerifyPage({
       <p>
         ここに登録されていなかった場合、当日投票できません。もし書かれていない場合は委員にお問い合わせください。
       </p>
-      <p>リハーサル当日までに必ず自分の生徒番号があり、パートが正しいか確認してください。</p>
+      <p>
+        リハーサル当日までに必ず自分の生徒番号があり、パートが正しいか確認してください。
+      </p>
       <div className={styles.verifyContainer}>
         <Selectors
           grades={GRADES}

@@ -174,20 +174,20 @@ function VoteRehearsalContent() {
 
   const currentRoster =
     rosterProgress &&
-      grade &&
-      className &&
-      part &&
-      rosterProgress.grade === grade &&
-      rosterProgress.className === className &&
-      rosterProgress.part === part
+    grade &&
+    className &&
+    part &&
+    rosterProgress.grade === grade &&
+    rosterProgress.className === className &&
+    rosterProgress.part === part
       ? rosterProgress
       : null;
   const votedCount = currentRoster?.votedCount ?? 0;
   const hasCurrentRoster = currentRoster !== null;
   const currentRosterError =
     rosterError?.grade === grade &&
-      rosterError.className === className &&
-      rosterError.part === part
+    rosterError.className === className &&
+    rosterError.part === part
       ? rosterError.message
       : null;
   const isLoadingRoster = Boolean(
@@ -219,8 +219,8 @@ function VoteRehearsalContent() {
   const visibleStep = hasInvalidResumedConfig
     ? "setup"
     : step === "voting" &&
-      currentRoster !== null &&
-      currentRoster.votedCount >= count
+        currentRoster !== null &&
+        currentRoster.votedCount >= count
       ? "finished"
       : step;
 
