@@ -1,7 +1,5 @@
 {
   "title": "Add seed.mjs",
-  "description": "TODO",
-  "credits": [
-    "@SakaYq4875"
-  ]
+  "description": "シードをローカルで生成できるようにしました。",
+  "credits": ["@SakaYq4875"]
 }
