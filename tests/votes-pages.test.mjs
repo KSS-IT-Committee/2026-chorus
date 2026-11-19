@@ -122,7 +122,7 @@ test("student details hide choices and restrict vote actions to operators", asyn
   assert.match(admin, /1A01/);
   assert.match(admin, /未投票/);
   assert.match(admin, /操作/);
-  assert.doesNotMatch(admin, /第一希望|第二希望|firstClass|secondClass/);
+  assert.doesNotMatch(admin, /1番のクラス|2番のクラス|firstClass|secondClass/);
   user = { username: "reader", permission: "member" };
   assert.doesNotMatch(await renderPage(page, props), /操作/);
   await assert.rejects(

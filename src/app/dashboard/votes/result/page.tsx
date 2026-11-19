@@ -60,7 +60,7 @@ async function VoteResultsContent() {
                     <dt>{letter}組</dt>
                     <dd className={styles.choices}>
                       <div>
-                        <span className={styles.label}>第一希望</span>
+                        <span className={styles.label}>1番のクラス</span>
                         <div>
                           <span className={styles.number}>
                             {total?.firstCount ?? 0}
@@ -69,7 +69,7 @@ async function VoteResultsContent() {
                         </div>
                       </div>
                       <div>
-                        <span className={styles.label}>第二希望</span>
+                        <span className={styles.label}>2番のクラス</span>
                         <div>
                           <span className={styles.number}>
                             {total?.secondCount ?? 0}

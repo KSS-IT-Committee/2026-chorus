@@ -69,8 +69,8 @@ test("results show every class, use zero for missing counts, and require a signe
   assert.match(html, /5<\/span>/);
   assert.match(html, /0<\/span>/);
   assert.match(html, /無効票は含みません/);
-  assert.equal((html.match(/第一希望/g) ?? []).length, 12);
-  assert.equal((html.match(/第二希望/g) ?? []).length, 12);
+  assert.equal((html.match(/1番のクラス/g) ?? []).length, 12);
+  assert.equal((html.match(/2番のクラス/g) ?? []).length, 12);
   assert.match(html, /3<\/span>/);
   assert.doesNotMatch(html, /投票を追加/);
   user = { permission: "operator" };

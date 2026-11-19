@@ -34,7 +34,7 @@ export async function addManualVoteAction(
   const secondClass = toClassName(grade, second);
   if (!firstClass || !secondClass || firstClass === secondClass)
     return {
-      error: "第一希望と第二希望には異なるクラスを選択してください。",
+      error: "1番のクラスと2番のクラスには異なるクラスを選択してください。",
       success: false,
     };
   try {

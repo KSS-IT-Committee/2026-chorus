@@ -83,7 +83,7 @@ function VoteForm({ close }: { close: () => void }) {
           </option>
         ))}
       </select>
-      <label htmlFor="manual-first">第一希望</label>
+      <label htmlFor="manual-first">1番のクラス</label>
       <select
         id="manual-first"
         name="firstClass"
@@ -100,7 +100,7 @@ function VoteForm({ close }: { close: () => void }) {
           </option>
         ))}
       </select>
-      <label htmlFor="manual-second">第二希望</label>
+      <label htmlFor="manual-second">2番のクラス</label>
       <select
         id="manual-second"
         name="secondClass"
