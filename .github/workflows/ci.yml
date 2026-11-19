@@ -244,18 +244,7 @@ jobs:
         if: steps.cache-modules-test.outputs.cache-hit != 'true'
         run: npm ci
 
-      - name: Check if test script exists
-        id: check-test
-        run: |
-          if npm run | grep -q "test"; then
-            echo "has_tests=true" >> $GITHUB_OUTPUT
-          else
-            echo "has_tests=false" >> $GITHUB_OUTPUT
-            echo "ℹ️ No test script found. Skipping tests."
-          fi
-
       - name: Run tests
-        if: steps.check-test.outputs.has_tests == 'true'
         run: npm test
 
   # Security audit
