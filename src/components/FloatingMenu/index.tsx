@@ -11,6 +11,7 @@ const MENU_ITEMS = [
   { href: "/", label: "トップ" },
   { href: "/vote-rehearsal", label: "リハーサル投票" },
   { href: "/dashboard", label: "合唱委員会" },
+  { href: "/verify", label: "生徒情報" },
 ] as const;
 
 export function FloatingMenu() {

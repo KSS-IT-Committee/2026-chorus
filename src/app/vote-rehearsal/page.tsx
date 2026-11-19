@@ -525,6 +525,8 @@ function VoteRehearsalContent() {
                     この投票は取り消せません。
                     <br />
                     内容をよく確認してから送信してください。
+                    <br />
+                    もしも、あなたの出席番号が表示されない場合は合唱委員会に伝えてください。
                   </InformationNote>
 
                   <button
