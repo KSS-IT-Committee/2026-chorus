@@ -1,0 +1,2 @@
+-- Keep older audit entries that predate required reasons.
+ALTER TABLE "audit_logs" ADD CONSTRAINT "audit_logs_reason_required" CHECK ("audit_logs"."action" not in ('vote.create_manual', 'vote.delete', 'vote.invalidate', 'member.create', 'member.password_reset', 'member.permission_change', 'member.delete') or coalesce(jsonb_typeof("audit_logs"."details"->'reason') = 'string' and length(btrim("audit_logs"."details"->>'reason')) between 1 and 500, false)) NOT VALID;

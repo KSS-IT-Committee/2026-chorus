@@ -1,0 +1,124 @@
+import { useEffect, useRef, type KeyboardEvent } from "react";
+import styles from "./index.module.css";
+
+type VoteConfirmationProps = {
+  attendanceNumber: number;
+  choices: { grade: number; firstClass: string; secondClass: string }[];
+  error: string | null;
+  isSubmitting: boolean;
+  onCancel: () => void;
+  onConfirm: () => void | Promise<void>;
+};
+
+export default function VoteConfirmation({
+  attendanceNumber,
+  choices,
+  error,
+  isSubmitting,
+  onCancel,
+  onConfirm,
+}: VoteConfirmationProps) {
+  const cancelButtonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    const previousActiveElement = document.activeElement;
+    cancelButtonRef.current?.focus();
+
+    return () => {
+      if (
+        previousActiveElement instanceof HTMLElement &&
+        previousActiveElement.isConnected
+      ) {
+        previousActiveElement.focus();
+      }
+    };
+  }, []);
+
+  function handleDialogKeyDown(event: KeyboardEvent<HTMLElement>) {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      if (!isSubmitting) onCancel();
+      return;
+    }
+
+    if (event.key !== "Tab") return;
+
+    const focusableElements = event.currentTarget.querySelectorAll<HTMLElement>(
+      'a[href], button:not([disabled]), input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])',
+    );
+    const firstElement = focusableElements[0];
+    const lastElement = focusableElements[focusableElements.length - 1];
+
+    if (!firstElement || !lastElement) {
+      event.preventDefault();
+    } else if (event.shiftKey && document.activeElement === firstElement) {
+      event.preventDefault();
+      lastElement.focus();
+    } else if (!event.shiftKey && document.activeElement === lastElement) {
+      event.preventDefault();
+      firstElement.focus();
+    }
+  }
+
+  return (
+    <div className={styles.overlay}>
+      <section
+        className={styles.dialog}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="confirm-title"
+        aria-describedby="confirm-description"
+        onKeyDown={handleDialogKeyDown}
+      >
+        <h2 id="confirm-title" className={styles.title}>
+          この内容で投票しますか？
+        </h2>
+        <p id="confirm-description" className={styles.description}>
+          投票後は取り消すことができません。
+        </p>
+        <dl className={styles.summary}>
+          <div>
+            <dt>出席番号:</dt>
+            <dd>{attendanceNumber}番</dd>
+          </div>
+          {choices.map(({ grade, firstClass }) => (
+            <div key={grade}>
+              <dt>1番のクラス:</dt>
+              <dd>{firstClass}組</dd>
+            </div>
+          ))}
+          {choices.map(({ grade, secondClass }) => (
+            <div key={grade}>
+              <dt>2番のクラス:</dt>
+              <dd>{secondClass}組</dd>
+            </div>
+          ))}
+        </dl>
+        {error && (
+          <p className={styles.error} role="alert">
+            {error}
+          </p>
+        )}
+        <div className={styles.actions}>
+          <button
+            className={styles.cancel}
+            type="button"
+            ref={cancelButtonRef}
+            disabled={isSubmitting}
+            onClick={onCancel}
+          >
+            戻って修正する
+          </button>
+          <button
+            className={styles.confirm}
+            type="button"
+            disabled={isSubmitting}
+            onClick={onConfirm}
+          >
+            {isSubmitting ? "送信中…" : "投票を確定する"}
+          </button>
+        </div>
+      </section>
+    </div>
+  );
+}

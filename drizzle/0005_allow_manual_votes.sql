@@ -1,0 +1,1 @@
+ALTER TABLE "votes" ALTER COLUMN "student_id" DROP NOT NULL;
