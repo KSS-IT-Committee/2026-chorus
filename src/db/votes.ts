@@ -160,7 +160,11 @@ export async function getVoteProgress(
     .from(students)
     .leftJoin(
       votes,
-      and(eq(votes.studentId, students.id), eq(votes.grade, students.grade)),
+      and(
+        eq(votes.studentId, students.id),
+        eq(votes.grade, students.grade),
+        eq(votes.invalid, false),
+      ),
     )
     .where(and(eq(students.classname, classname), eq(students.part, part)))
     .orderBy(asc(students.attendanceNumber));
@@ -230,6 +234,7 @@ export async function registerVote(
           firstClass: votes.firstClass,
           secondClass: votes.secondClass,
           requestId: votes.requestId,
+          invalid: votes.invalid,
         })
         .from(votes)
         .where(eq(votes.studentId, student.id));
@@ -245,7 +250,11 @@ export async function registerVote(
           ? "replayed"
           : "idempotency-conflict";
       }
-      if (existing.some((vote) => vote.grade === choice.grade))
+      if (
+        existing.some(
+          (vote) => !vote.invalid && vote.grade === choice.grade,
+        )
+      )
         return "already-voted";
 
       await tx.insert(votes).values({

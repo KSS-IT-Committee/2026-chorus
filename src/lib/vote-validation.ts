@@ -1,5 +1,10 @@
 import { PARTS } from "@/db/schema";
-import { toClassName, type ClassName, type Grade } from "@/lib/class-name";
+import {
+  toClassName,
+  toVoteClassPair,
+  type ClassName,
+  type Grade,
+} from "@/lib/class-name";
 
 export type VoteSubmission = {
   requestId: string;
@@ -49,12 +54,14 @@ export function parseVoteSubmission(value: unknown): VoteSubmission | null {
     typeof choice.secondClass !== "string"
   )
     return null;
-  const firstClass = toClassName(targetGrade, choice.firstClass);
-  const secondClass = toClassName(targetGrade, choice.secondClass);
+  const pair = toVoteClassPair(
+    targetGrade,
+    choice.firstClass,
+    choice.secondClass,
+  );
+  if (!pair) return null;
+  const [firstClass, secondClass] = pair;
   if (
-    !firstClass ||
-    !secondClass ||
-    firstClass === secondClass ||
     firstClass === classname ||
     secondClass === classname
   )

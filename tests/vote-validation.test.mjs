@@ -14,6 +14,7 @@ registerHooks({
 });
 
 const { parseVoteSubmission } = await import("../src/lib/vote-validation.ts");
+const { toVoteClassPair } = await import("../src/lib/class-name.ts");
 
 const input = {
   grade: "1",
@@ -46,4 +47,11 @@ test("rejects invalid identification, duplicate grades, and invalid rankings", (
     { choices: [{ ...first, firstClass: "E" }] },
   ])
     assert.equal(parseVoteSubmission({ ...input, ...overrides }), null);
+});
+
+test("shares vote class pair validation", () => {
+  assert.deepEqual(toVoteClassPair(2, "A", "D"), ["2A", "2D"]);
+  assert.equal(toVoteClassPair(2, "A", "A"), null);
+  assert.equal(toVoteClassPair(4, "A", "B"), null);
+  assert.equal(toVoteClassPair(2, "A", "E"), null);
 });
