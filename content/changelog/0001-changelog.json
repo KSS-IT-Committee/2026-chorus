@@ -1,7 +1,5 @@
 {
   "title": "Configure Renovate",
-  "description": "TODO",
-  "credits": [
-    "@renovate[bot]"
-  ]
+  "description": "Renovateという自動依存関係更新ツールの設定を追加しました。",
+  "credits": ["@renovate[bot]", "@SakaYq4875"]
 }
