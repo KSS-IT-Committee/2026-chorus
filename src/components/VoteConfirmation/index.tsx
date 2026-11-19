@@ -83,13 +83,13 @@ export default function VoteConfirmation({
           </div>
           {choices.map(({ grade, firstClass }) => (
             <div key={grade}>
-              <dt>第一希望:</dt>
+              <dt>1番のクラス:</dt>
               <dd>{firstClass}組</dd>
             </div>
           ))}
           {choices.map(({ grade, secondClass }) => (
             <div key={grade}>
-              <dt>第二希望:</dt>
+              <dt>2番のクラス:</dt>
               <dd>{secondClass}組</dd>
             </div>
           ))}

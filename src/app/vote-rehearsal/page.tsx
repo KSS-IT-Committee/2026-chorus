@@ -494,7 +494,7 @@ function VoteRehearsalContent() {
                   {validAttendanceNumber && (
                     <div className={styles.ballotFields}>
                       <PullDown
-                        label="第1希望"
+                        label="1番のクラス"
                         value={firstClass ?? ""}
                         options={options}
                         onChange={(value) =>
@@ -506,7 +506,7 @@ function VoteRehearsalContent() {
                         }
                       />
                       <PullDown
-                        label="第2希望"
+                        label="2番のクラス"
                         value={secondClass ?? ""}
                         options={options.filter(
                           ({ value }) => value !== firstClass,
