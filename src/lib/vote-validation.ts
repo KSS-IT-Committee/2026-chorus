@@ -61,11 +61,7 @@ export function parseVoteSubmission(value: unknown): VoteSubmission | null {
   );
   if (!pair) return null;
   const [firstClass, secondClass] = pair;
-  if (
-    firstClass === classname ||
-    secondClass === classname
-  )
-    return null;
+  if (firstClass === classname || secondClass === classname) return null;
   return {
     requestId: requestId.toLowerCase(),
     classname,

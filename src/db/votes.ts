@@ -250,11 +250,7 @@ export async function registerVote(
           ? "replayed"
           : "idempotency-conflict";
       }
-      if (
-        existing.some(
-          (vote) => !vote.invalid && vote.grade === choice.grade,
-        )
-      )
+      if (existing.some((vote) => !vote.invalid && vote.grade === choice.grade))
         return "already-voted";
 
       await tx.insert(votes).values({
