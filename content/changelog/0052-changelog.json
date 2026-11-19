@@ -1,7 +1,5 @@
 {
   "title": "improve ux of dialog",
-  "description": "TODO",
-  "credits": [
-    "@SakaYq4875"
-  ]
+  "description": "ダイアログのUXを改善しました。",
+  "credits": ["@SakaYq4875"]
 }
