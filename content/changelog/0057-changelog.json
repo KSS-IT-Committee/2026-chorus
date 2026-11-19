@@ -1,7 +1,5 @@
 {
   "title": "actions.lockの生成",
-  "description": "TODO",
-  "credits": [
-    "@SakaYq4875"
-  ]
+  "description": "GitHub Actionsのlockファイルを生成しました。",
+  "credits": ["@SakaYq4875"]
 }
