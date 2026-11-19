@@ -81,12 +81,16 @@ export default function VoteConfirmation({
             <dt>出席番号:</dt>
             <dd>{attendanceNumber}番</dd>
           </div>
-          {choices.map(({ grade, firstClass, secondClass }) => (
+          {choices.map(({ grade, firstClass }) => (
             <div key={grade}>
-              <dt>{grade}年</dt>
-              <dd>
-                第1希望 {firstClass}組・第2希望 {secondClass}組
-              </dd>
+              <dt>第一希望:</dt>
+              <dd>{firstClass}組</dd>
+            </div>
+          ))}
+          {choices.map(({ grade, secondClass }) => (
+            <div key={grade}>
+              <dt>第二希望:</dt>
+              <dd>{secondClass}組</dd>
             </div>
           ))}
         </dl>

@@ -492,33 +492,30 @@ function VoteRehearsalContent() {
                   />
 
                   {validAttendanceNumber && (
-                    <fieldset className={styles.ballot}>
-                      <legend>{grade}年</legend>
-                      <div className={styles.ballotFields}>
-                        <PullDown
-                          label="第1希望"
-                          value={firstClass ?? ""}
-                          options={options}
-                          onChange={(value) =>
-                            setChoice({
-                              firstClass: value,
-                              secondClass:
-                                value === secondClass ? "" : secondClass,
-                            })
-                          }
-                        />
-                        <PullDown
-                          label="第2希望"
-                          value={secondClass ?? ""}
-                          options={options.filter(
-                            ({ value }) => value !== firstClass,
-                          )}
-                          onChange={(value) =>
-                            setChoice({ firstClass, secondClass: value })
-                          }
-                        />
-                      </div>
-                    </fieldset>
+                    <div className={styles.ballotFields}>
+                      <PullDown
+                        label="第1希望"
+                        value={firstClass ?? ""}
+                        options={options}
+                        onChange={(value) =>
+                          setChoice({
+                            firstClass: value,
+                            secondClass:
+                              value === secondClass ? "" : secondClass,
+                          })
+                        }
+                      />
+                      <PullDown
+                        label="第2希望"
+                        value={secondClass ?? ""}
+                        options={options.filter(
+                          ({ value }) => value !== firstClass,
+                        )}
+                        onChange={(value) =>
+                          setChoice({ firstClass, secondClass: value })
+                        }
+                      />
+                    </div>
                   )}
 
                   <InformationNote variant="warning">
