@@ -26,8 +26,21 @@ const [{ getVoteProgress, registerVote }, { students, votes }] =
     import("../src/db/schema.ts"),
   ]);
 
+// votes_student_grade_unique は (student_id, grade) WHERE invalid = false の
+// 部分ユニークインデックスなので、モックでも有効票の重複だけを 23505 で拒否する。
+function violatesStudentGradeUnique(rows, row) {
+  return rows.some(
+    (vote) =>
+      !vote.invalid &&
+      vote.studentId === row.studentId &&
+      vote.grade === row.grade,
+  );
+}
+
 function createDatabase({
   existingVotes = [],
+  // SELECT には見えないが INSERT 時には存在する票（同時投票の競合を再現する）。
+  concurrentVotes = [],
   student = { id: "student-1" },
 } = {}) {
   const savedVotes = [...existingVotes];
@@ -46,7 +59,11 @@ function createDatabase({
             orderBy: async () => [
               {
                 attendanceNumber: 1,
-                voteId: savedVotes.some(({ grade }) => grade === 1) ? 1 : null,
+                voteId: savedVotes.some(
+                  ({ grade, invalid }) => grade === 1 && !invalid,
+                )
+                  ? 1
+                  : null,
               },
               { attendanceNumber: 2, voteId: null },
             ],
@@ -55,7 +72,16 @@ function createDatabase({
       }),
     }),
     insert: () => ({
-      values: async (row) => savedVotes.push(row),
+      values: async (row) => {
+        if (
+          violatesStudentGradeUnique([...savedVotes, ...concurrentVotes], row)
+        )
+          throw Object.assign(new Error("duplicate key value"), {
+            code: "23505",
+            constraint_name: "votes_student_grade_unique",
+          });
+        savedVotes.push(row);
+      },
     }),
   };
   return {
@@ -94,6 +120,7 @@ test("registers one grade, accepts a retry, and rejects a different ballot", asy
 
 test("votes for other grades do not block the rehearsal ballot", async () => {
   const existing = {
+    studentId: "student-1",
     grade: 2,
     firstClass: "2A",
     secondClass: "2B",
@@ -125,17 +152,47 @@ test("returns student-not-found when the roster has no matching student", async 
 
 test("an invalidated ballot does not block a new vote for the same grade", async () => {
   const existing = {
+    studentId: "student-1",
     grade: 1,
     firstClass: "1B",
     secondClass: "1C",
     requestId: "old-request",
     invalid: true,
   };
-  const { database, savedVotes } = createDatabase({
+  const { database, executor, savedVotes } = createDatabase({
     existingVotes: [existing],
   });
+  assert.equal(
+    (await getVoteProgress("1A", "Soprano", executor)).votedCount,
+    0,
+  );
   assert.equal(await registerVote(submission, database), "created");
   assert.equal(savedVotes.length, 2);
+  assert.equal(
+    (await getVoteProgress("1A", "Soprano", executor)).votedCount,
+    1,
+  );
+  assert.equal(
+    await registerVote({ ...submission, requestId: "another-id" }, database),
+    "already-voted",
+  );
+});
+
+test("a concurrent valid ballot for the same grade is reported as already-voted", async () => {
+  const { database, savedVotes } = createDatabase({
+    concurrentVotes: [
+      {
+        studentId: "student-1",
+        grade: 1,
+        firstClass: "1C",
+        secondClass: "1D",
+        requestId: "other-request",
+        invalid: false,
+      },
+    ],
+  });
+  assert.equal(await registerVote(submission, database), "already-voted");
+  assert.equal(savedVotes.length, 0);
 });
 
 test("the voting action validates submissions without a login", async () => {
