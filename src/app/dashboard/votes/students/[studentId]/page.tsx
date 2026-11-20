@@ -45,16 +45,26 @@ async function StudentVotesContent({ params }: { params: Params }) {
       <section className={rosterStyles.content}>
         <h2 className={styles.subtitle}>投票状況</h2>
         <ul className={styles.pageList}>
-          {GRADES.map((grade) => {
-            const vote = records.find((record) => record.grade === grade);
-            return (
-              <li key={grade} className={styles.pageListItem}>
+          {GRADES.flatMap((grade) => {
+            // 無効化後に再投票すると同じ学年に複数の票が残るため、すべて表示する。
+            const votes = records.filter((record) => record.grade === grade);
+            if (!votes.length)
+              return (
+                <li key={`grade-${grade}`} className={styles.pageListItem}>
+                  <div className={rosterStyles.voteRow}>
+                    <span className={styles.username}>{grade}年への投票</span>
+                    <span className={rosterStyles.listStatus}>未投票</span>
+                  </div>
+                </li>
+              );
+            return votes.map((vote) => (
+              <li key={`vote-${vote.id}`} className={styles.pageListItem}>
                 <div className={rosterStyles.voteRow}>
                   <span className={styles.username}>{grade}年への投票</span>
                   <span className={rosterStyles.listStatus}>
-                    {!vote ? "未投票" : vote.invalid ? "無効票" : "投票済み"}
+                    {vote.invalid ? "無効票" : "投票済み"}
                   </span>
-                  {vote && canEdit && (
+                  {canEdit && (
                     <VoteActions
                       studentId={student.id}
                       voteId={vote.id}
@@ -64,7 +74,7 @@ async function StudentVotesContent({ params }: { params: Params }) {
                   )}
                 </div>
               </li>
-            );
+            ));
           })}
         </ul>
       </section>

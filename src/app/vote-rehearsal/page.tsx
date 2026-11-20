@@ -410,9 +410,8 @@ function VoteRehearsalContent() {
                 {grade &&
                   className &&
                   part &&
-                  (isLoadingRoster ? (
-                    <p>名簿を確認しています…</p>
-                  ) : hasCurrentRoster && rosterProgress ? (
+                  (isLoadingRoster ? null : hasCurrentRoster &&
+                    rosterProgress ? (
                     <AbsenceSelector
                       students={rosterProgress.students}
                       selectedAttendanceNumbers={absentAttendanceNumbers}

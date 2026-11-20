@@ -1,6 +1,6 @@
 import "server-only";
 
-import { and, asc, count, desc, eq, isNull, sql } from "drizzle-orm";
+import { and, asc, desc, eq, isNull, sql } from "drizzle-orm";
 import { auditLogs, students, votes } from "@/db/schema";
 import type { ClassName } from "@/lib/class-name";
 import { db, type Executor } from "@/lib/db";
@@ -13,7 +13,11 @@ export async function getVoteStudentSummaries(className?: ClassName) {
       id: students.id,
       className: students.classname,
       attendanceNumber: students.attendanceNumber,
-      voteCount: count(votes.id),
+      // 無効化後に再投票した学年を二重に数えないよう、有効票だけを数える。
+      voteCount:
+        sql<number>`count(${votes.id}) filter (where not ${votes.invalid})`.mapWith(
+          Number,
+        ),
       invalidCount:
         sql<number>`count(${votes.id}) filter (where ${votes.invalid})`.mapWith(
           Number,
@@ -44,7 +48,7 @@ export async function getStudentVotes(studentId: string) {
     })
     .from(votes)
     .where(eq(votes.studentId, studentId))
-    .orderBy(votes.grade);
+    .orderBy(votes.grade, votes.id);
   return { student, records };
 }
 
@@ -160,7 +164,11 @@ export async function getVoteProgress(
     .from(students)
     .leftJoin(
       votes,
-      and(eq(votes.studentId, students.id), eq(votes.grade, students.grade)),
+      and(
+        eq(votes.studentId, students.id),
+        eq(votes.grade, students.grade),
+        eq(votes.invalid, false),
+      ),
     )
     .where(and(eq(students.classname, classname), eq(students.part, part)))
     .orderBy(asc(students.attendanceNumber));
@@ -230,6 +238,7 @@ export async function registerVote(
           firstClass: votes.firstClass,
           secondClass: votes.secondClass,
           requestId: votes.requestId,
+          invalid: votes.invalid,
         })
         .from(votes)
         .where(eq(votes.studentId, student.id));
@@ -245,7 +254,7 @@ export async function registerVote(
           ? "replayed"
           : "idempotency-conflict";
       }
-      if (existing.some((vote) => vote.grade === choice.grade))
+      if (existing.some((vote) => !vote.invalid && vote.grade === choice.grade))
         return "already-voted";
 
       await tx.insert(votes).values({
