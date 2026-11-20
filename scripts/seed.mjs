@@ -1,5 +1,4 @@
 import { Client } from "pg";
-import { randomBytes } from "node:crypto";
 
 const client = new Client({
   connectionString: process.env.DATABASE_URL,
@@ -37,7 +36,7 @@ function createStudents() {
   shuffle(parts);
 
   return attendanceNumbers.map((attendanceNumber, i) => ({
-    id: randomBytes(16).toString("hex"),
+    id: `${GRADE}${CLASS}${attendanceNumber.toString()}`,
     grade: GRADE,
     class: CLASS,
     classname: `${GRADE}${CLASS}`,
