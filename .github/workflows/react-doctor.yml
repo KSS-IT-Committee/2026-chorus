@@ -1,0 +1,35 @@
+name: React Doctor
+
+on:
+  pull_request:
+    branches: ["main"]
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: react-doctor-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  react-doctor:
+    name: React Doctor
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Scan changed React code
+        uses: millionco/react-doctor@695e46eee203a5d1855020191aa7e9c010a1250e # v2
+        with:
+          version: 0.9.23
+          scope: changed
+          blocking: warning
+          comment: false
+          review-comments: false
+          commit-status: false
