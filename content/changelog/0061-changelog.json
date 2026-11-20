@@ -1,7 +1,5 @@
 {
   "title": "Add react-doctor workflow",
-  "description": "TODO",
-  "credits": [
-    "@SakaYq4875"
-  ]
+  "description": "React Doctorというライブラリを使ったワークフローを導入しました。",
+  "credits": ["@SakaYq4875"]
 }
