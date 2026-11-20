@@ -1,8 +1,4 @@
-import { Client } from "pg";
-
-const client = new Client({
-  connectionString: process.env.DATABASE_URL,
-});
+import postgres from "postgres";
 
 const GRADE = 1;
 const CLASS = "A";
@@ -46,16 +42,17 @@ function createStudents() {
 }
 
 async function main() {
-  await client.connect();
+  if (!process.env.DATABASE_URL) {
+    throw new Error("DATABASE_URL is not set");
+  }
 
+  const sql = postgres(process.env.DATABASE_URL, { max: 1 });
   try {
-    await client.query("BEGIN");
-
     const students = createStudents();
 
-    for (const student of students) {
-      await client.query(
-        `
+    await sql.begin(async (tx) => {
+      for (const student of students) {
+        await tx`
           INSERT INTO students (
             id,
             grade,
@@ -64,20 +61,17 @@ async function main() {
             attendance_number,
             part
           )
-          VALUES ($1, $2, $3, $4, $5, $6)
-        `,
-        [
-          student.id,
-          student.grade,
-          student.class,
-          student.classname,
-          student.attendance_number,
-          student.part,
-        ],
-      );
-    }
-
-    await client.query("COMMIT");
+          VALUES (
+            ${student.id},
+            ${student.grade},
+            ${student.class},
+            ${student.classname},
+            ${student.attendance_number},
+            ${student.part}
+          )
+        `;
+      }
+    });
 
     console.table(
       [...students].sort((a, b) => a.attendance_number - b.attendance_number),
@@ -93,11 +87,8 @@ async function main() {
         ]),
       ),
     );
-  } catch (error) {
-    await client.query("ROLLBACK");
-    throw error;
   } finally {
-    await client.end();
+    await sql.end();
   }
 }
 
