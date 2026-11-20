@@ -1,6 +1,6 @@
 import "server-only";
 
-import { and, asc, count, desc, eq, isNull, sql } from "drizzle-orm";
+import { and, asc, desc, eq, isNull, sql } from "drizzle-orm";
 import { auditLogs, students, votes } from "@/db/schema";
 import type { ClassName } from "@/lib/class-name";
 import { db, type Executor } from "@/lib/db";
@@ -13,7 +13,11 @@ export async function getVoteStudentSummaries(className?: ClassName) {
       id: students.id,
       className: students.classname,
       attendanceNumber: students.attendanceNumber,
-      voteCount: count(votes.id),
+      // 無効化後に再投票した学年を二重に数えないよう、有効票だけを数える。
+      voteCount:
+        sql<number>`count(${votes.id}) filter (where not ${votes.invalid})`.mapWith(
+          Number,
+        ),
       invalidCount:
         sql<number>`count(${votes.id}) filter (where ${votes.invalid})`.mapWith(
           Number,
@@ -44,7 +48,7 @@ export async function getStudentVotes(studentId: string) {
     })
     .from(votes)
     .where(eq(votes.studentId, studentId))
-    .orderBy(votes.grade);
+    .orderBy(votes.grade, votes.id);
   return { student, records };
 }
 
