@@ -111,11 +111,3 @@
 .part p {
   margin-top: 12px;
 }
-
-@media (prefers-color-scheme: dark) {
-  .main {
-    --theme-input-surface: var(--NAVY_B);
-    --theme-input-text: var(--theme-text);
-    color-scheme: dark;
-  }
-}

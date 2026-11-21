@@ -65,7 +65,7 @@
 
 .selectWrap select:invalid,
 .selectWrap select option[value=""] {
-  color: var(--theme-muted) !important;
+  color: var(--theme-muted);
 }
 
 .selectWrap select:focus {
