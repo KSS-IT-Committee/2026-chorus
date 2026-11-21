@@ -1,0 +1,5 @@
+{
+  "title": "nodejsのバージョン更新",
+  "description": "nodejsのコンテナのバージョンを更新しました。",
+  "credits": ["@renovate[bot]"]
+}
