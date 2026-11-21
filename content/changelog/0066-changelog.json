@@ -1,0 +1,5 @@
+{
+  "title": "remove pg",
+  "description": "コードで全く使われていないpgライブラリをアンインストールしました。",
+  "credits": ["@SakaYq4875"]
+}
