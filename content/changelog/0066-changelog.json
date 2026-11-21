@@ -1,7 +1,5 @@
 {
   "title": "remove pg",
-  "description": "TODO",
-  "credits": [
-    "@SakaYq4875"
-  ]
+  "description": "コードで全く使われていないpgライブラリをアンインストールしました。",
+  "credits": ["@SakaYq4875"]
 }
