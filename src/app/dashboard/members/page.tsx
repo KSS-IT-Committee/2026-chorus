@@ -34,7 +34,9 @@ async function MembersContent() {
           <div className={styles.titleContainer}>
             <h2 className={styles.subtitle}>委員アカウント一覧</h2>
 
-            {user.permission === "admin" && <CreateMemberButton />}
+            {(user.permission === "admin" || user.permission === "it") && (
+              <CreateMemberButton itOnly={user.permission === "it"} />
+            )}
           </div>
           {members.length ? (
             <ul className={styles.pageList}>
@@ -65,7 +67,8 @@ async function MembersContent() {
             <div>
               <dt>it</dt>
               <dd>
-                投票結果の閲覧・管理とアカウント作成を除く操作が可能です。
+                投票結果の閲覧・管理はできません。作成できるアカウントは it
+                のみです。
               </dd>
             </div>
             <div>
@@ -88,8 +91,7 @@ async function MembersContent() {
             </div>
           </dl>
           <p className={styles.roleNote}>
-            アカウントの作成は admin、権限の変更と削除は admin と it
-            が行えます。
+            アカウントの作成は admin と it が行えます。
           </p>
         </aside>
       </div>

@@ -13,7 +13,7 @@ export async function createMemberAction(
   formData: FormData,
 ): Promise<{ error: string | null; success: boolean }> {
   const user = await getCurrentUser();
-  if (!user || user.permission !== "admin") {
+  if (!user || (user.permission !== "admin" && user.permission !== "it")) {
     return { error: "アカウントを作成する権限がありません。", success: false };
   }
 
@@ -41,6 +41,9 @@ export async function createMemberAction(
   }
   if (!permission) {
     return { error: "権限を選択してください。", success: false };
+  }
+  if (user.permission === "it" && permission !== "it") {
+    return { error: "IT権限のアカウントのみ作成できます。", success: false };
   }
 
   try {

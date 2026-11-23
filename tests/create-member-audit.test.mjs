@@ -25,7 +25,7 @@ const modules = {
   "next/cache": { revalidatePath: () => {} },
   "@/db/addMembers": { addMembers: async (...args) => changes.push(args) },
   "@/db/schema": {
-    PERMISSION: ["admin", "operator", "editor", "member"],
+    PERMISSION: ["admin", "operator", "editor", "member", "it"],
     auditLogs: {},
   },
   "@/lib/db": { db: { transaction: async (callback) => callback(tx) } },
@@ -46,12 +46,12 @@ vm.runInNewContext(code, {
   require: (id) => modules[id],
   console: { error() {} },
 });
-function submit(reason) {
+function submit(reason, permission = "editor") {
   const form = new FormData();
   for (const [key, value] of Object.entries({
     username: "new-member",
     password: "password1",
-    permission: "editor",
+    permission,
     reason,
   }))
     form.set(key, value);
@@ -70,9 +70,14 @@ test("member creation requires a reason and records no password", async () => {
   assert.equal(logs[0].details.reason, "新規登録");
   assert.equal(JSON.stringify(logs).includes("password1"), false);
   user = { username: "it-user", permission: "it" };
-  assert.equal((await submit("新規登録")).success, false);
+  for (const permission of ["admin", "operator", "editor", "member"]) {
+    assert.equal((await submit("新規登録", permission)).success, false);
+  }
   assert.equal(changes.length, 1);
   assert.equal(logs.length, 1);
+  assert.equal((await submit("新規登録", "it")).success, true);
+  assert.equal(logs.at(-1).details.permission, "it");
+  assert.equal(logs.at(-1).operatorName, "it-user");
   user = { username: "admin", permission: "admin" };
   failLog = true;
   assert.equal((await submit("新規登録")).success, false);

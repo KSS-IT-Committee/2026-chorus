@@ -19,7 +19,7 @@ export default function Page({
   return (
     <main className={styles.main}>
       <Suspense fallback={null}>
-        <AuthGuard minimumPermission="admin">
+        <AuthGuard minimumPermission="admin" excludeIt>
           <MemberContent params={params} />
         </AuthGuard>
       </Suspense>
