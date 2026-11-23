@@ -64,7 +64,9 @@ async function MembersContent() {
           <dl className={styles.roleList}>
             <div>
               <dt>it</dt>
-              <dd>投票結果の閲覧・管理とアカウント作成を除く操作が可能です。</dd>
+              <dd>
+                投票結果の閲覧・管理とアカウント作成を除く操作が可能です。
+              </dd>
             </div>
             <div>
               <dt>admin</dt>
@@ -86,7 +88,8 @@ async function MembersContent() {
             </div>
           </dl>
           <p className={styles.roleNote}>
-            アカウントの作成は admin、権限の変更と削除は admin と it が行えます。
+            アカウントの作成は admin、権限の変更と削除は admin と it
+            が行えます。
           </p>
         </aside>
       </div>

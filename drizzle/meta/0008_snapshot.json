@@ -150,12 +150,8 @@
           "name": "sessions_username_members_username_fk",
           "tableFrom": "sessions",
           "tableTo": "members",
-          "columnsFrom": [
-            "username"
-          ],
-          "columnsTo": [
-            "username"
-          ],
+          "columnsFrom": ["username"],
+          "columnsTo": ["username"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -260,11 +256,7 @@
         "students_grade_class_number_unique": {
           "name": "students_grade_class_number_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "grade",
-            "class",
-            "attendance_number"
-          ]
+          "columns": ["grade", "class", "attendance_number"]
         }
       },
       "policies": {},
@@ -367,12 +359,8 @@
           "name": "votes_student_id_students_id_fk",
           "tableFrom": "votes",
           "tableTo": "students",
-          "columnsFrom": [
-            "student_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["student_id"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -382,10 +370,7 @@
         "votes_student_grade_unique": {
           "name": "votes_student_grade_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "student_id",
-            "grade"
-          ]
+          "columns": ["student_id", "grade"]
         }
       },
       "policies": {},
@@ -428,23 +413,12 @@
     "public.part": {
       "name": "part",
       "schema": "public",
-      "values": [
-        "Soprano",
-        "Alto",
-        "Tenor",
-        "Bass"
-      ]
+      "values": ["Soprano", "Alto", "Tenor", "Bass"]
     },
     "public.permission": {
       "name": "permission",
       "schema": "public",
-      "values": [
-        "admin",
-        "operator",
-        "editor",
-        "member",
-        "it"
-      ]
+      "values": ["admin", "operator", "editor", "member", "it"]
     }
   },
   "schemas": {},

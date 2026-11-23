@@ -1,7 +1,5 @@
 {
-  "title": "added it role",
-  "description": "TODO",
-  "credits": [
-    "@Shirym-min"
-  ]
+  "title": "IT委員会アカウント",
+  "description": "IT委員会用のアカウント作成を可能にしました",
+  "credits": ["@Shirym-min"]
 }
