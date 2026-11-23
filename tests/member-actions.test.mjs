@@ -84,7 +84,7 @@ function setup() {
   };
 }
 
-test("IT members can manage other accounts", async () => {
+test("IT members cannot manage other accounts", async () => {
   const ctx = setup();
   ctx.setUser({ username: "it-user", permission: "it" });
   const result = await ctx.action({
@@ -92,8 +92,9 @@ test("IT members can manage other accounts", async () => {
     operation: "permission",
     permission: "editor",
   });
-  assert.equal(result.success, true);
-  assert.deepEqual(ctx.calls[0], ["permission", "target", "editor"]);
+  assert.equal(result.success, false);
+  assert.deepEqual(ctx.calls, []);
+  assert.deepEqual(ctx.logs, []);
 });
 
 test("member actions require an administrator and validate input", async () => {
