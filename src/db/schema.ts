@@ -115,10 +115,7 @@ export const votes = pgTable(
       .defaultNow(),
   },
   (table) => [
-    // 無効票は残したまま同じ学年へ再投票できるよう、有効票だけを一意にする。
-    uniqueIndex("votes_student_grade_unique")
-      .on(table.studentId, table.grade)
-      .where(sql`${table.invalid} = false`),
+    unique("votes_student_grade_unique").on(table.studentId, table.grade),
     uniqueIndex("votes_request_id_unique").on(table.requestId),
     check("votes_grade_range", sql`${table.grade} between 1 and 3`),
     check(

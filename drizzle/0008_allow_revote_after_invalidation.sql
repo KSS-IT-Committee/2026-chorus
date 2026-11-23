@@ -1,2 +1,0 @@
-ALTER TABLE "votes" DROP CONSTRAINT "votes_student_grade_unique";--> statement-breakpoint
-CREATE UNIQUE INDEX "votes_student_grade_unique" ON "votes" USING btree ("student_id","grade") WHERE "votes"."invalid" = false;

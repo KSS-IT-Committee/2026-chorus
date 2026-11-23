@@ -55,10 +55,7 @@ const modules = {
       id === "1A1"
         ? {
             student: { id, className: "1A", attendanceNumber: 1 },
-            records: [
-              { id: 9, grade: 1, invalid: true },
-              { id: 12, grade: 1, invalid: false },
-            ],
+            records: [{ id: 9, grade: 1, invalid: true }],
           }
         : null,
   },
@@ -122,9 +119,6 @@ test("student details hide choices and restrict vote actions to operators", asyn
   const props = { params: Promise.resolve({ studentId: "1A1" }) };
   const admin = await renderPage(page, props);
   assert.match(admin, /無効票/);
-  assert.match(admin, /投票済み/);
-  assert.equal(admin.match(/1年への投票/g).length, 2);
-  assert.equal(admin.match(/操作/g).length, 2);
   assert.match(admin, /1A01/);
   assert.match(admin, /未投票/);
   assert.match(admin, /操作/);
