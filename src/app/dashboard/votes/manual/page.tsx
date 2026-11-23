@@ -14,7 +14,7 @@ export const instant = false;
 export default function ManualVotesPage() {
   return (
     <main className={styles.main}>
-      <AuthGuard minimumPermission="operator">
+      <AuthGuard minimumPermission="operator" excludeIt>
         <ManualVotesContent />
       </AuthGuard>
     </main>
@@ -23,7 +23,8 @@ export default function ManualVotesPage() {
 
 async function ManualVotesContent() {
   const user = await getCurrentUser();
-  if (!hasMinimumPermission(user, "operator")) return null;
+  if (user?.permission === "it" || !hasMinimumPermission(user, "operator"))
+    return null;
   const records = await getManualVotes();
   const format = new Intl.DateTimeFormat("ja-JP", {
     timeZone: "Asia/Tokyo",

@@ -31,7 +31,13 @@ export const CLASSNAMES = [
   "3D",
 ] as const;
 
-export const PERMISSION = ["admin", "operator", "editor", "member"] as const;
+export const PERMISSION = [
+  "admin",
+  "operator",
+  "editor",
+  "member",
+  "it",
+] as const;
 
 export const PARTS = ["Soprano", "Alto", "Tenor", "Bass"] as const;
 

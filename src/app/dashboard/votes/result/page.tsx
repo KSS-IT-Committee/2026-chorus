@@ -16,7 +16,7 @@ export const instant = false;
 export default function VoteResultsPage() {
   return (
     <main className={layoutStyles.main}>
-      <AuthGuard minimumPermission="member">
+      <AuthGuard minimumPermission="member" excludeIt>
         <VoteResultsContent />
       </AuthGuard>
     </main>
@@ -25,7 +25,7 @@ export default function VoteResultsPage() {
 
 async function VoteResultsContent() {
   const user = await getCurrentUser();
-  if (!user) return null;
+  if (!user || user.permission === "it") return null;
   const canEdit = hasMinimumPermission(user, "operator");
   const totals = await getVoteTotals();
 

@@ -174,6 +174,7 @@ function MemberActionForm({
             <option value="editor">editor</option>
             <option value="operator">operator</option>
             <option value="admin">admin</option>
+            <option value="it">it</option>
           </select>
         </>
       )}

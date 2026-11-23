@@ -18,7 +18,7 @@ type Params = Promise<{ studentId: string }>;
 export default function StudentVotesPage({ params }: { params: Params }) {
   return (
     <main className={styles.main}>
-      <AuthGuard minimumPermission="member">
+      <AuthGuard minimumPermission="member" excludeIt>
         <StudentVotesContent params={params} />
       </AuthGuard>
     </main>
@@ -27,7 +27,7 @@ export default function StudentVotesPage({ params }: { params: Params }) {
 
 async function StudentVotesContent({ params }: { params: Params }) {
   const user = await getCurrentUser();
-  if (!user) return null;
+  if (!user || user.permission === "it") return null;
   const { studentId } = await params;
   if (!studentId || studentId.length > 32) notFound();
   const result = await getStudentVotes(studentId);

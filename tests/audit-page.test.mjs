@@ -112,6 +112,11 @@ test("audit page displays recorded operations and handles old or unknown records
   ])
     assert.ok(html.includes(value), value);
   assert.doesNotMatch(html, /secret-not-for-display|firstClass|1A/);
+  user = { permission: "it" };
+  const itHtml = renderToStaticMarkup(await content.type(content.props));
+  assert.match(itHtml, /権限を変更/);
+  assert.doesNotMatch(itHtml, /投票を無効化|投票を削除|1C03/);
+  user = { permission: "member" };
   logs = [];
   assert.match(
     renderToStaticMarkup(await content.type(content.props)),
@@ -119,5 +124,5 @@ test("audit page displays recorded operations and handles old or unknown records
   );
   user = null;
   assert.equal(await content.type(content.props), null);
-  assert.equal(reads, 2);
+  assert.equal(reads, 3);
 });

@@ -13,7 +13,7 @@ const pageList = [
 export default function VotesPage() {
   return (
     <main className={styles.main}>
-      <AuthGuard minimumPermission="member">
+      <AuthGuard minimumPermission="member" excludeIt>
         <VotesContent />
       </AuthGuard>
     </main>

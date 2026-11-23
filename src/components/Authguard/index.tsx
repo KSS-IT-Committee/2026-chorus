@@ -7,14 +7,18 @@ import { hasMinimumPermission } from "@/lib/permission";
 export async function AuthGuard({
   children,
   minimumPermission,
+  excludeIt = false,
 }: {
   children: React.ReactNode;
   minimumPermission?: (typeof PERMISSION)[number];
+  excludeIt?: boolean;
 }) {
   const user = await getCurrentUser();
   if (!user) {
     unauthorized();
   }
+
+  if (excludeIt && user.permission === "it") forbidden();
 
   if (
     minimumPermission !== undefined &&

@@ -69,6 +69,11 @@ test("member creation requires a reason and records no password", async () => {
   assert.equal(logs[0].operatorName, "admin");
   assert.equal(logs[0].details.reason, "新規登録");
   assert.equal(JSON.stringify(logs).includes("password1"), false);
+  user = { username: "it-user", permission: "it" };
+  assert.equal((await submit("新規登録")).success, false);
+  assert.equal(changes.length, 1);
+  assert.equal(logs.length, 1);
+  user = { username: "admin", permission: "admin" };
   failLog = true;
   assert.equal((await submit("新規登録")).success, false);
 });

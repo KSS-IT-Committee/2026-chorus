@@ -5,7 +5,6 @@ import { getCurrentUser } from "@/lib/session";
 import { getMembers } from "@/db/getMembers";
 import Link from "next/link";
 import { CreateMemberButton } from "@/components/CreateMemberButton";
-import { Internal } from "@/components/Internal";
 
 export const instant = false;
 
@@ -35,9 +34,7 @@ async function MembersContent() {
           <div className={styles.titleContainer}>
             <h2 className={styles.subtitle}>委員アカウント一覧</h2>
 
-            <Internal minimumPermission="admin">
-              <CreateMemberButton />
-            </Internal>
+            {user.permission === "admin" && <CreateMemberButton />}
           </div>
           {members.length ? (
             <ul className={styles.pageList}>
@@ -66,6 +63,10 @@ async function MembersContent() {
           <h2 className={styles.subtitle}>権限について</h2>
           <dl className={styles.roleList}>
             <div>
+              <dt>it</dt>
+              <dd>投票結果の閲覧・管理とアカウント作成を除く操作が可能です。</dd>
+            </div>
+            <div>
               <dt>admin</dt>
               <dd>
                 全ての操作が可能です。委員アカウントの作成・削除も可能です。
@@ -85,7 +86,7 @@ async function MembersContent() {
             </div>
           </dl>
           <p className={styles.roleNote}>
-            権限の変更とアカウントの作成・削除は、管理者のみが行えます。
+            アカウントの作成は admin、権限の変更と削除は admin と it が行えます。
           </p>
         </aside>
       </div>

@@ -30,8 +30,13 @@ export default function AuditPage() {
 }
 
 async function AuditContent() {
-  if (!(await getCurrentUser())) return null;
-  const logs = await getAuditLogs();
+  const user = await getCurrentUser();
+  if (!user) return null;
+  const logs = (await getAuditLogs()).filter(
+    (log) =>
+      user.permission !== "it" ||
+      (log.targetType !== "vote" && !log.action.startsWith("vote.")),
+  );
   const format = new Intl.DateTimeFormat("ja-JP", {
     timeZone: "Asia/Tokyo",
     year: "numeric",
@@ -69,7 +74,7 @@ async function AuditContent() {
                 : null;
             const permission =
               typeof details?.permission === "string" &&
-              ["admin", "operator", "editor", "member"].includes(
+              ["admin", "operator", "editor", "member", "it"].includes(
                 details.permission,
               )
                 ? details.permission

@@ -117,6 +117,7 @@ test("student registration checks permission, inputs and duplicate errors", asyn
   failure = new Error("duplicate", { cause: { code: "23505" } });
   assert.match((await submit()).error, /既に登録/);
   failure = undefined;
+  user = { permission: "it" };
   assert.equal((await submit()).success, true);
   assert.equal(created[0].id, "3C22");
   assert.equal(created[0].attendanceNumber, 22);
