@@ -1,7 +1,5 @@
 {
   "title": "投票の無効化の説明",
-  "description": "TODO",
-  "credits": [
-    "@Shirym-min"
-  ]
+  "description": "投票無効化に関する説明を表記しました。",
+  "credits": ["@Shirym-min"]
 }
