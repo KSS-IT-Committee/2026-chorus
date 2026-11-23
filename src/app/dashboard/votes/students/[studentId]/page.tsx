@@ -68,6 +68,9 @@ async function StudentVotesContent({ params }: { params: Params }) {
           })}
         </ul>
       </section>
+      <p>
+        なお、無効票は投票を無効にしつつ、再投票を防ぐことができます。投票を無効化し、再投票ができるようにしたい場合は投票の削除を行ってください。
+      </p>
     </>
   );
 }
