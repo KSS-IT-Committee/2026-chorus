@@ -1,5 +1,6 @@
 import { PERMISSION } from "@/db/schema";
 import { getCurrentUser } from "@/lib/session";
+import { hasMinimumPermission } from "@/lib/permission";
 
 export async function Internal({
   children,
@@ -9,8 +10,6 @@ export async function Internal({
   minimumPermission: (typeof PERMISSION)[number];
 }) {
   const user = await getCurrentUser();
-  const required = PERMISSION.indexOf(minimumPermission);
-  const actual = user ? PERMISSION.indexOf(user.permission) : -1;
-  if (required < 0 || actual < 0 || actual > required) return null;
+  if (!hasMinimumPermission(user, minimumPermission)) return null;
   return <>{children}</>;
 }

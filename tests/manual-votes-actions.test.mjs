@@ -52,6 +52,8 @@ test("manual votes require operator and two different classes in one grade", asy
   assert.equal((await submit()).success, false);
   user = { username: "reader", permission: "editor" };
   assert.equal((await submit()).success, false);
+  user = { username: "it", permission: "it" };
+  assert.equal((await submit()).success, false);
   user = { username: "operator", permission: "operator" };
   for (const invalid of [
     { grade: "4" },

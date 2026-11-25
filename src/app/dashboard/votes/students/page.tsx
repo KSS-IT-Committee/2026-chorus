@@ -19,7 +19,7 @@ export default function VoteStudentPage({
 }) {
   return (
     <main className={styles.main}>
-      <AuthGuard minimumPermission="member">
+      <AuthGuard minimumPermission="member" excludeIt>
         <VoteStudentContent searchParams={searchParams} />
       </AuthGuard>
     </main>
@@ -31,7 +31,8 @@ async function VoteStudentContent({
 }: {
   searchParams: SearchParams;
 }) {
-  if (!(await getCurrentUser())) return null;
+  const user = await getCurrentUser();
+  if (!user || user.permission === "it") return null;
   const params = await searchParams;
   const grade = GRADES.find((value) => String(value) === params.grade);
   const className =

@@ -12,7 +12,7 @@ export async function addManualVoteAction(
   formData: FormData,
 ): Promise<{ error: string | null; success: boolean }> {
   const user = await getCurrentUser();
-  if (!hasMinimumPermission(user, "operator"))
+  if (user?.permission === "it" || !hasMinimumPermission(user, "operator"))
     return { error: "投票を追加する権限がありません。", success: false };
   const reason = getAuditReason(formData.get("reason"));
   if (!reason)

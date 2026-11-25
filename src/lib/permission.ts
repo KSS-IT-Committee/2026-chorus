@@ -9,5 +9,7 @@ export function hasMinimumPermission(
   if (!user) return false;
   const actualIndex = PERMISSION.indexOf(user.permission);
   const minimumIndex = PERMISSION.indexOf(minimum);
+  if (user.permission === "it") return minimumIndex >= 0;
+  if (minimum === "it") return user.permission === "admin";
   return actualIndex >= 0 && minimumIndex >= 0 && actualIndex <= minimumIndex;
 }

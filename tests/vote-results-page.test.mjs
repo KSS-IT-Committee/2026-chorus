@@ -60,6 +60,7 @@ vm.runInNewContext(code, { exports, require: (id) => modules[id] });
 test("results show every class, use zero for missing counts, and require a signed-in user", async () => {
   const guard = exports.default().props.children;
   assert.equal(guard.props.minimumPermission, "member");
+  assert.equal(guard.props.excludeIt, true);
   const content = guard.props.children;
   const tree = await content.type(content.props);
   assert.equal(tree.props.children[0].props.intervalMs, 3_000);
@@ -77,6 +78,8 @@ test("results show every class, use zero for missing counts, and require a signe
   const operatorHtml = renderToStaticMarkup(await content.type(content.props));
   assert.match(operatorHtml, /投票を追加/);
   assert.match(operatorHtml, /手動投票の一覧/);
+  user = { permission: "it" };
+  assert.equal(await content.type(content.props), null);
   user = null;
   assert.equal(await content.type(content.props), null);
   assert.equal(reads, 2);

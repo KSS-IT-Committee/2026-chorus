@@ -16,6 +16,4 @@ ssh -t USER@HOST 'docker exec -it CONTAINER node /app/scripts/create-member.mjs 
 
 `USER`、`HOST`、`CONTAINER`、`USERNAME` は実際の値に置き換えてください。パスワードは表示されるプロンプトに入力します。
 
-`Internal` は `minimumPermission` に指定した権限以上のメンバーに子要素を表示します。権限は高い順に `admin`、`operator`、`editor`、`member` です。表示の制限とは別に、データの取得や変更を行う処理でも権限を確認してください。
-
 ログイン試行回数の制限はプロセス単位です。複数台で運用する場合は共有の制限機構が必要です。また、大量の異なるユーザー名による試行を防ぐため、公開環境ではリバースプロキシなどでもリクエスト数を制限してください。

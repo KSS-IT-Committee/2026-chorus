@@ -60,6 +60,8 @@ test("vote mutations require operator permission and validate the target", async
   assert.equal((await submit()).success, false);
   user = { username: "reader", permission: "editor" };
   assert.equal((await submit()).success, false);
+  user = { username: "it", permission: "it" };
+  assert.equal((await submit()).success, false);
   user = { username: "operator", permission: "operator" };
   for (const values of [
     { voteId: "-1" },

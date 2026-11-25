@@ -15,10 +15,11 @@ const { hasMinimumPermission } = exports;
 
 test("checks every permission against every minimum", () => {
   const expected = {
-    admin: [true, true, true, true],
-    operator: [false, true, true, true],
-    editor: [false, false, true, true],
-    member: [false, false, false, true],
+    admin: [true, true, true, true, true],
+    operator: [false, true, true, true, false],
+    editor: [false, false, true, true, false],
+    member: [false, false, false, true, false],
+    it: [true, true, true, true, true],
   };
   for (const [actual, results] of Object.entries(expected)) {
     PERMISSION.forEach((minimum, index) => {

@@ -57,6 +57,13 @@
       "when": 1794923234432,
       "tag": "0007_little_dragon_man",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1795419192637,
+      "tag": "0008_slimy_gateway",
+      "breakpoints": true
     }
   ]
 }

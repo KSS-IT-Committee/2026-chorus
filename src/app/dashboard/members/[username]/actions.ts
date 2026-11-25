@@ -15,7 +15,7 @@ export async function updateMemberAction(
   formData: FormData,
 ): Promise<{ error: string | null; success: boolean }> {
   const user = await getCurrentUser();
-  if (!user || user.permission !== "admin") {
+  if (!user || !["admin"].includes(user.permission)) {
     return { error: "この操作を行う権限がありません。", success: false };
   }
 

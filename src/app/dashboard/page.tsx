@@ -39,13 +39,15 @@ async function DashboardContent() {
       <p>ログイン中：{user.username}</p>
 
       <nav className={styles.pageList} aria-label="ページ一覧">
-        {pageList.map((page) => (
-          <div key={page.href} className={styles.pageListItem}>
-            <Link href={"/dashboard" + page.href} className={styles.pageLink}>
-              {page.title}
-            </Link>
-          </div>
-        ))}
+        {pageList
+          .filter((page) => user.permission !== "it" || page.href !== "/votes")
+          .map((page) => (
+            <div key={page.href} className={styles.pageListItem}>
+              <Link href={"/dashboard" + page.href} className={styles.pageLink}>
+                {page.title}
+              </Link>
+            </div>
+          ))}
       </nav>
       <br />
       <br />

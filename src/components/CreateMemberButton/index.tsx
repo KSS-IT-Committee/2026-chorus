@@ -5,7 +5,7 @@ import { AuditReasonField } from "@/components/AuditReasonField";
 import { createMemberAction } from "@/app/dashboard/members/actions";
 import styles from "./CreateMemberButton.module.css";
 
-export function CreateMemberButton() {
+export function CreateMemberButton({ itOnly = false }: { itOnly?: boolean }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const [isOpen, setIsOpen] = useState(false);
 
@@ -34,16 +34,27 @@ export function CreateMemberButton() {
           }
         }}
       >
-        {isOpen && <CreateMemberForm close={() => dialog.current?.close()} />}
+        {isOpen && (
+          <CreateMemberForm
+            itOnly={itOnly}
+            close={() => dialog.current?.close()}
+          />
+        )}
       </dialog>
     </>
   );
 }
 
-function CreateMemberForm({ close }: { close: () => void }) {
+function CreateMemberForm({
+  close,
+  itOnly,
+}: {
+  close: () => void;
+  itOnly: boolean;
+}) {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [permission, setPermission] = useState("member");
+  const [permission, setPermission] = useState(itOnly ? "it" : "member");
   const [reason, setReason] = useState("");
   const [state, action, pending] = useActionState(createMemberAction, {
     error: null,
@@ -102,10 +113,15 @@ function CreateMemberForm({ close }: { close: () => void }) {
         value={permission}
         onChange={(event) => setPermission(event.target.value)}
       >
-        <option value="member">member</option>
-        <option value="editor">editor</option>
-        <option value="operator">operator</option>
-        <option value="admin">admin</option>
+        {!itOnly && (
+          <>
+            <option value="member">member</option>
+            <option value="editor">editor</option>
+            <option value="operator">operator</option>
+            <option value="admin">admin</option>
+          </>
+        )}
+        <option value="it">it</option>
       </select>
       <AuditReasonField
         value={reason}

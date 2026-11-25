@@ -19,7 +19,7 @@ export default function Page({
   return (
     <main className={styles.main}>
       <Suspense fallback={null}>
-        <AuthGuard minimumPermission="admin">
+        <AuthGuard minimumPermission="admin" excludeIt>
           <MemberContent params={params} />
         </AuthGuard>
       </Suspense>
@@ -35,7 +35,7 @@ async function MemberContent({
   const { username } = await params;
   const user = await getCurrentUser();
   if (!user) unauthorized();
-  if (user.permission !== "admin") forbidden();
+  if (!["admin", "it"].includes(user.permission)) forbidden();
   const [member] = await db
     .select({ username: members.username, permission: members.permission })
     .from(members)

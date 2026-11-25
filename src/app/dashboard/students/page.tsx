@@ -66,7 +66,9 @@ async function StudentsContent({
       </Link>
       <div className={rosterStyles.pageHeader}>
         <h1 className={styles.title}>生徒名簿</h1>
-        {user?.permission === "admin" && <ImportStudentsButton />}
+        {(user?.permission === "admin" || user?.permission === "it") && (
+          <ImportStudentsButton />
+        )}
       </div>
       <section className={rosterStyles.content}>
         <div className={rosterStyles.header}>

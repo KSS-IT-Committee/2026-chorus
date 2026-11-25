@@ -84,6 +84,19 @@ function setup() {
   };
 }
 
+test("IT members cannot manage other accounts", async () => {
+  const ctx = setup();
+  ctx.setUser({ username: "it-user", permission: "it" });
+  const result = await ctx.action({
+    username: "target",
+    operation: "permission",
+    permission: "editor",
+  });
+  assert.equal(result.success, false);
+  assert.deepEqual(ctx.calls, []);
+  assert.deepEqual(ctx.logs, []);
+});
+
 test("member actions require an administrator and validate input", async () => {
   const ctx = setup();
   const base = { username: "target", operation: "delete" };
