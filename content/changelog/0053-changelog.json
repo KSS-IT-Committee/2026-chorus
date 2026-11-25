@@ -1,0 +1,5 @@
+{
+  "title": "Add seed.mjs",
+  "description": "シードをローカルで生成できるようにしました。",
+  "credits": ["@SakaYq4875"]
+}

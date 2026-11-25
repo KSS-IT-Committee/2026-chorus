@@ -15,6 +15,7 @@
     "format:check": "prettier --check .",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "drizzle-kit migrate",
+    "db:seed": "node scripts/seed.mjs",
     "fix": "npm run lint:fix && npm run format"
   },
   "dependencies": {
