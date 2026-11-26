@@ -32,3 +32,14 @@ export function toClassName(
   const className = `${gradeNumber}${letter}`;
   return CLASSNAMES.find((name) => name === className) ?? null;
 }
+
+export function toVoteClassPair(
+  grade: number | string,
+  firstClassLetter: string,
+  secondClassLetter: string,
+): [ClassName, ClassName] | null {
+  const firstClass = toClassName(grade, firstClassLetter);
+  const secondClass = toClassName(grade, secondClassLetter);
+  if (!firstClass || !secondClass || firstClass === secondClass) return null;
+  return [firstClass, secondClass];
+}

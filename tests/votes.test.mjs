@@ -123,6 +123,22 @@ test("returns student-not-found when the roster has no matching student", async 
   assert.equal(await registerVote(submission, database), "student-not-found");
 });
 
+test("an invalidated ballot still blocks a new vote for the same grade", async () => {
+  const existing = {
+    grade: 1,
+    firstClass: "1B",
+    secondClass: "1C",
+    requestId: "old-request",
+    invalid: true,
+  };
+  const { database, savedVotes } = createDatabase({
+    existingVotes: [existing],
+  });
+  // 無効化は再投票を許さない。再投票させたい場合は票を削除する。
+  assert.equal(await registerVote(submission, database), "already-voted");
+  assert.equal(savedVotes.length, 1);
+});
+
 test("the voting action validates submissions without a login", async () => {
   const { submitRehearsalVote } =
     await import("../src/app/vote-rehearsal/actions.ts");

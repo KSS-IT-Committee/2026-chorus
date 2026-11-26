@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { addManualVote } from "@/db/votes";
-import { isGrade, toClassName } from "@/lib/class-name";
+import { isGrade, toVoteClassPair } from "@/lib/class-name";
 import { hasMinimumPermission } from "@/lib/permission";
 import { getCurrentUser } from "@/lib/session";
 import { getAuditReason } from "@/lib/audit-reason";
@@ -30,13 +30,13 @@ export async function addManualVoteAction(
     typeof second !== "string"
   )
     return { error: "学年とクラスを選択してください。", success: false };
-  const firstClass = toClassName(grade, first);
-  const secondClass = toClassName(grade, second);
-  if (!firstClass || !secondClass || firstClass === secondClass)
+  const pair = toVoteClassPair(grade, first, second);
+  if (!pair)
     return {
       error: "1番のクラスと2番のクラスには異なるクラスを選択してください。",
       success: false,
     };
+  const [firstClass, secondClass] = pair;
   try {
     await addManualVote(grade, firstClass, secondClass, user.username, reason);
   } catch {
